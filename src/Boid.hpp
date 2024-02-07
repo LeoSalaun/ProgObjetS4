@@ -12,10 +12,12 @@ private:
     std::vector<float> direction;
     
 
+
 public:
     Boid();
 
     void display(p6::Context &ctx);
     void updatePosition();
     const static int DIMENSION = 2;
+
 };
