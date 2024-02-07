@@ -4,11 +4,11 @@
 #include <time.h>
 
 Boid::Boid()
-: position(Boid::DIMENSION), speed(Boid::DIMENSION) {
+: position(Boid::DIMENSION), direction(Boid::DIMENSION) {
     srand(time(NULL));
     color = {static_cast<float>(rand()%256)/256 , static_cast<float>(rand()%256)/256 , static_cast<float>(rand()%256)/256};
     for (int i=0 ; i<Boid::DIMENSION ; i++) {
-        speed[i] = static_cast<float>(rand()%100-50)/10000;
+        direction[i] = static_cast<float>(rand()%100-50)/10000;
     }
 }
 
@@ -21,7 +21,8 @@ void Boid::display(p6::Context &ctx) {
 
 void Boid::updatePosition() {
     for (int i=0 ; i<Boid::DIMENSION ; i++) {
-        speed[i] = static_cast<float>(rand()%100-50)/10000;
-        position[i] += speed[i];
-    }
+        direction[i] = static_cast<float>(rand()%100-50)/1000;
+        position[i] += direction[i];
+    
+}
 }
