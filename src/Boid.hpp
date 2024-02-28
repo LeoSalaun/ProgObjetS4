@@ -16,6 +16,7 @@ public:
     glm::vec3 getColor() const;
     vec       getDirection() const;
     //    const static int DIMENSION = 2;
+    void CalculateSeparationForce(const std::vector<Boid>& boids);
 
 private:
     vec       position;
