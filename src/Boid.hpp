@@ -10,15 +10,16 @@ class Boid {
 public:
     Boid();
 
-    void display(p6::Context &ctx);
-    void updatePosition();
-    vec getPosition() const;
+    void      display(p6::Context& ctx);
+    void      updatePosition();
+    vec       getPosition() const;
     glm::vec3 getColor() const;
-    vec getDirection() const;
-//    const static int DIMENSION = 2;
+    vec       getDirection() const;
+    //    const static int DIMENSION = 2;
+    void CalculateSeparationForce(const std::vector<Boid>& boids);
 
 private:
-    vec position;
+    vec       position;
     glm::vec3 color;
-    vec direction;
+    vec       direction;
 };
