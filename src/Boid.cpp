@@ -40,3 +40,20 @@ glm::vec3 Boid::getColor() const {
 vec Boid::getDirection() const {
     return direction;
 }
+
+void Boid::CalculateSeparationForce(const std::vector<Boid>& boids){
+
+    float totalForce =  0;
+    float separationDistance = 1.0f;
+
+    for(const auto& otherBoid : boids){
+        if (&otherBoid != this) { 
+            float distance = glm::distance(position, otherBoid.getPosition());
+            vec separationDirection = position - otherBoid.getPosition();
+        
+            if (distance > 0) {
+                totalForce += glm::length(separationDirection) / distance;
+            }
+        }
+    }
+}
