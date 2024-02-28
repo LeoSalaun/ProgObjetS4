@@ -57,3 +57,21 @@ void Boid::CalculateSeparationForce(const std::vector<Boid>& boids){
         }
     }
 }
+
+
+ vec CalculateAlignmentForce(const std::vector<Boid>& boids){
+    vec averageDirection(0.0f);
+
+    for(const auto& otherBoid:boids){
+        if (&otherBoid != this) { 
+            averageDirection += otherBoid.getDirection();
+        }
+        if (!boids.empty()) {
+        averageDirection /= static_cast<float>(boids.size());
+        }
+        if (glm::length(averageDirection) > 0) {
+            return glm::normalize(averageDirection);
+        } 
+    }
+    }
+ 
