@@ -17,6 +17,7 @@ public:
     vec       getDirection() const;
     //    const static int DIMENSION = 2;
     void CalculateSeparationForce(const std::vector<Boid>& boids);
+    vec CalculateAlignmentForce(const std::vector<Boid>& boids);
     void applySteeringForces();
 
 private:
