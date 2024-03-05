@@ -26,11 +26,20 @@ int main()
 
     // Declare your infinite update loop.
     ctx.update = [&]() {
-        ctx.background(p6::NamedColor::Jade);
+        ctx.background(p6::NamedColor::Black);
+
+        ctx.fill = {1, 1, 1, 1};
+        ctx.square(
+            p6::Center{0,0},
+            p6::Radius{0.52f}
+        );
+
+        ctx.fill = {0.75, 0, 0, 1};
+        ctx.stroke_weight = 0.f;
         listeBoids.update();
         listeBoids.display(ctx);
 
-        b.updatePosition();
+        //b.updatePosition();
         b.display(ctx);
     };
 

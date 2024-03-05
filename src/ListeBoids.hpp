@@ -5,6 +5,7 @@
 class ListeBoids {
     private:
         std::vector<Boid> listeBoids;
+        vec averagePosition;
     
     public:
         ListeBoids();
@@ -13,4 +14,5 @@ class ListeBoids {
         void addBoid(Boid b);
         void update();
         void display(p6::Context &ctx) const;
+        vec calculateCohesionForce();
 };
