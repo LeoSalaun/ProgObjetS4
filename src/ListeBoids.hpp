@@ -14,5 +14,5 @@ class ListeBoids {
         void addBoid(Boid b);
         void update();
         void display(p6::Context &ctx) const;
-        void calculateCohesionForce();
+        vec calculateCohesionForce();
 };
