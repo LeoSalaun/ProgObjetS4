@@ -11,13 +11,13 @@ public:
     Boid();
 
     void      display(p6::Context& ctx);
-    void      updatePosition(vec cohesionForce);
+    void      updatePosition(const std::vector<Boid>& boids, vec cohesionForce);
     vec       getPosition() const;
     glm::vec3 getColor() const;
     vec       getDirection() const;
     //    const static int DIMENSION = 2;
     void CalculateSeparationForce(const std::vector<Boid>& boids);
-    vec CalculateAlignmentForce(const std::vector<Boid>& boids);
+    vec  CalculateAlignmentForce(const std::vector<Boid>& boids);
     void applySteeringForces();
 
 private:

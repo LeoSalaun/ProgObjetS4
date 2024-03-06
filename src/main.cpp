@@ -26,7 +26,7 @@ int main()
 
     // Declare your infinite update loop.
     ctx.update = [&]() {
-        ctx.background(p6::NamedColor::Black);
+        ctx.background(p6::NamedColor::Red);
 
         ctx.fill = {1, 1, 1, 1};
         ctx.square(
