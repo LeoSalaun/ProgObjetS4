@@ -4,8 +4,8 @@
 #include <ostream>
 #include <vector>
 
-const float ALIGNMENT_STRENGTH = 1/1000;
-const float COHESION_STRENGTH = 1/10;
+const float ALIGNMENT_STRENGTH = 1/10000;
+const float COHESION_STRENGTH = 1/100000000;
 
 ListeBoids::ListeBoids()
 : listeBoids() {}

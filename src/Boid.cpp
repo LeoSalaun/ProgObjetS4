@@ -6,8 +6,8 @@
 #include <time.h>
 #include <vector>
 
-const float SEPARATION_STRENGTH = 1.f/100000;
-const float WANDER_STRENGTH = 1.f/1000;
+const float SEPARATION_STRENGTH = 1.f/1000000;
+const float WANDER_STRENGTH = 1.f/100000000;
 
 double rand01() {
     thread_local std::default_random_engine gen{std::random_device{}()};
@@ -30,7 +30,8 @@ void Boid::display(p6::Context &ctx) {
 }
 
 void Boid::updatePosition(vec cohesionForce) {
-        position += direction + cohesionForce;
+        direction += cohesionForce;
+        position += direction;
         if (position.x > 0.5) position.x -= 1.f;
         if (position.x < -0.5) position.x += 1.f;
         if (position.y > 0.5) position.y -= 1.f;
@@ -52,17 +53,19 @@ vec Boid::getDirection() const {
 void Boid::CalculateSeparationForce(const std::vector<Boid>& listeBoids){
 
     vec totalForce =  vec(0);
-    float separationDistance = 1.0f;
+    float radius = 0.3f;
 
     for(const Boid& otherBoid : listeBoids){
         if (&otherBoid == this) continue; 
         float distance = glm::distance(position, otherBoid.getPosition());
         vec separationDirection = position - otherBoid.getPosition();
     
-        if (distance > 0) {
+        if (distance > 0 && distance < radius) {
             totalForce += separationDirection / (distance);
         }
     }
+    float distanceX = fmin(1.f-position[0],-1.f-position[0]);
+    vec separationDirection = position - vec(1,0);
     direction += totalForce * SEPARATION_STRENGTH;
     //std::cout << totalForce[0] << " , " << totalForce[1] << std::endl;
 }

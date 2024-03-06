@@ -14,7 +14,7 @@ int main()
         return EXIT_FAILURE;
 
     // Actual application code
-    auto ctx = p6::Context{{.title = "prog-web-s4"}};
+    auto ctx = p6::Context{{.title = "Les boids ils sont partout, dans les villes, les campagnes, sur les réseaux sociaaaauuuuux..."}};
     ctx.maximize_window();
 
     Boid b;
