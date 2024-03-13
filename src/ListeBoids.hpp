@@ -4,12 +4,10 @@
 
 class ListeBoids {
 private:
-    std::vector<Boid> listeBoids;
-    vec               averagePosition;
+    std::vector<Boid> listeBoids{};
+    vec               averagePosition{};
 
 public:
-    ListeBoids();
-
     void newBoid();
     void addBoid(Boid b);
     void update();

@@ -4,10 +4,8 @@
 #include <vector>
 #include "Boid.hpp"
 
-const float COHESION_STRENGTH = 1 / 1000000000;
+static constexpr float COHESION_STRENGTH { 1.f/ 1000000000.f};
 
-ListeBoids::ListeBoids()
-    : listeBoids() {}
 
 void ListeBoids::newBoid()
 {
@@ -26,13 +24,13 @@ void ListeBoids::update()
     {
         b.CalculateSeparationForce(listeBoids);
         vec cohesionForce = calculateCohesionForce();
-        b.updatePosition(listeBoids, cohesionForce);
+        b.updatePosition(listeBoids);
     }
 }
 
 void ListeBoids::display(p6::Context& ctx) const
 {
-    for (Boid b : listeBoids)
+    for (const Boid& b : listeBoids)
     {
         b.display(ctx);
     }

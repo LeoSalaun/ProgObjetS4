@@ -17,12 +17,12 @@ int main()
     auto ctx = p6::Context{{.title = "prog-web-s4"}};
     ctx.maximize_window();
 
-    Boid b;
-    ListeBoids listeBoids;
+    Boid b{};
+    ListeBoids listeBoids{};
     for (int i=0 ; i<10 ; i++) {
-        listeBoids.newBoid();
+        listeBoids.addBoid(Boid{});
     }
-    listeBoids.addBoid(b);
+   // listeBoids.addBoid(b);
 
     // Declare your infinite update loop.
     ctx.update = [&]() {

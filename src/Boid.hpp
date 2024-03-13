@@ -11,7 +11,7 @@ public:
     Boid();
 
     void      display(p6::Context& ctx);
-    void      updatePosition(const std::vector<Boid>& boids, vec cohesionForce);
+    void      updatePosition(const std::vector<Boid>& boids);
     vec       getPosition() const;
     glm::vec3 getColor() const;
     vec       getDirection() const;

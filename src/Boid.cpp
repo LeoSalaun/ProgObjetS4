@@ -6,9 +6,9 @@
 #include "glm/fwd.hpp"
 #include "p6/p6.h"
 
-const float SEPARATION_STRENGTH = 1.f / 100000;
-const float ALIGNMENT_STRENGTH  = 1 / 10;
-const float WANDER_STRENGTH     = 1.f / 100000;
+const float SEPARATION_STRENGTH = 1.f / 100000.f;
+const float ALIGNMENT_STRENGTH  = 1.f / 10.f;
+const float WANDER_STRENGTH     = 1.f / 100000.f;
 
 double rand01()
 {
@@ -19,8 +19,8 @@ double rand01()
 }
 
 Boid::Boid()
+ : color     { glm::vec3(rand01(), rand01(), rand01())}
 {
-    color     = glm::vec3(rand01(), rand01(), rand01());
     direction = vec((rand01() - 0.5) * WANDER_STRENGTH, (rand01() - 0.5) * WANDER_STRENGTH);
     position  = vec((rand01() - 0.5) * 0.8, (rand01() - 0.5) * 0.8);
 }
@@ -33,7 +33,7 @@ void Boid::display(p6::Context& ctx)
     );
 }
 
-vec Boid::CalculateAlignmentForce(const std::vector<Boid>& boids)
+vec Boid::CalculateAlignmentForce(const std::vector<Boid>& boids) const
 {
     vec averageDirection(0.0f);
 
@@ -42,8 +42,9 @@ vec Boid::CalculateAlignmentForce(const std::vector<Boid>& boids)
         if (&otherBoid != this)
         {
             averageDirection += otherBoid.getDirection();
-        }
-        if (!boids.empty())
+        }  
+    }
+     if (!boids.empty())
         {
             averageDirection /= static_cast<float>(boids.size());
         }
@@ -51,10 +52,10 @@ vec Boid::CalculateAlignmentForce(const std::vector<Boid>& boids)
         {
             return glm::normalize(averageDirection) * ALIGNMENT_STRENGTH;
         }
-    }
+    return vec{0.};
 }
 
-void Boid::updatePosition(const std::vector<Boid>& boids, vec cohesionForce)
+void Boid::updatePosition(const std::vector<Boid>& boids)
 {
     vec alignmentForce = CalculateAlignmentForce(boids);
     direction += alignmentForce;
