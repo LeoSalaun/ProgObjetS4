@@ -4,27 +4,23 @@
 #include <vector>
 #include "Boid.hpp"
 
-static constexpr float COHESION_STRENGTH { 1.f/ 1000000000.f};
-
-
-void ListeBoids::newBoid()
-{
-    Boid b;
-    listeBoids.push_back(b);
-}
-
 void ListeBoids::addBoid(Boid b)
 {
+    b.setWanderStrength(WANDER_STRENGTH);
     listeBoids.push_back(b);
 }
 
-void ListeBoids::update()
+void ListeBoids::addBoid()
+{
+    listeBoids.push_back(Boid{WANDER_STRENGTH});
+}
+
+void ListeBoids::update(float separation, float cohesion, float alignment)
 {
     for (Boid& b : listeBoids)
     {
-        b.CalculateSeparationForce(listeBoids);
-        vec cohesionForce = calculateCohesionForce();
-        b.updatePosition(listeBoids);
+        b.applySteeringForces(listeBoids, separation*FACTOR, cohesion*FACTOR, alignment*FACTOR);
+        b.updatePosition();
     }
 }
 
@@ -34,15 +30,4 @@ void ListeBoids::display(p6::Context& ctx) const
     {
         b.display(ctx);
     }
-}
-
-vec ListeBoids::calculateCohesionForce()
-{
-    averagePosition = vec(0, 0);
-    for (const Boid& b : listeBoids)
-    {
-        averagePosition += b.getPosition();
-    }
-    averagePosition /= listeBoids.size();
-    return averagePosition * COHESION_STRENGTH;
 }
