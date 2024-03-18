@@ -96,12 +96,13 @@ void Boid::CalculateSeparationForce(const std::vector<Boid>& listeBoids)
             continue;
         float distance            = glm::distance(position, otherBoid.getPosition());
         vec   separationDirection = position - otherBoid.getPosition();
-
-        if (distance > 0)
-        {
+    
+        if (distance > 0 && distance < radius) {
             totalForce += separationDirection / (distance);
         }
     }
+    float distanceX = fmin(1.f-position[0],-1.f-position[0]);
+    vec separationDirection = position - vec(1,0);
     direction += totalForce * SEPARATION_STRENGTH;
     // std::cout << totalForce[0] << " , " << totalForce[1] << std::endl;
 }

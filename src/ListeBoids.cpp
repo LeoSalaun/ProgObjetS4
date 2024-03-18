@@ -5,6 +5,7 @@
 #include "Boid.hpp"
 
 static constexpr float COHESION_STRENGTH { 1.f/ 1000000000.f};
+static constexpr float ALIGNMENT_STRENGTH { 1.f/ 10000.f};
 
 
 void ListeBoids::newBoid()
