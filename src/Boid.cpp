@@ -25,7 +25,7 @@ Boid::Boid()
     position  = vec((rand01() - 0.5) * 0.8, (rand01() - 0.5) * 0.8);
 }
 
-void Boid::display(p6::Context& ctx)
+void Boid::display(p6::Context& ctx) const
 {
     ctx.circle(
         p6::Center{position[0], position[1]},
