@@ -17,16 +17,16 @@ int main()
     auto ctx = p6::Context{{.title = "Les boids ils sont partout, dans les villes, les campagnes, sur les réseaux sociaaaauuuuux..."}};
     ctx.maximize_window();
 
-    Boid b;
-    ListeBoids listeBoids;
+    Boid b{};
+    ListeBoids listeBoids{};
     for (int i=0 ; i<10 ; i++) {
-        listeBoids.newBoid();
+        listeBoids.addBoid(Boid{});
     }
-    listeBoids.addBoid(b);
+   // listeBoids.addBoid(b);
 
     // Declare your infinite update loop.
     ctx.update = [&]() {
-        ctx.background(p6::NamedColor::Black);
+        ctx.background(p6::NamedColor::Red);
 
         ctx.fill = {1, 1, 1, 1};
         ctx.square(
