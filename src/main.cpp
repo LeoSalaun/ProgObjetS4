@@ -24,9 +24,25 @@ int main()
     }
    // listeBoids.addBoid(b);
 
+    auto separation = 5.f;
+    auto cohesion = 5.f;
+    auto alignment = 5.f;
+
+
+    ctx.imgui = [&]() {
+        ImGui::Begin("Steering forces");
+        ImGui::SliderFloat("Separation strength", &separation, 0.f, 10.f);
+        ImGui::SliderFloat("Cohesion strength", &cohesion, 0.f, 10.f);
+        ImGui::SliderFloat("Alignment strength", &alignment, 0.f, 10.f);
+        ImGui::End();
+        // Show the official ImGui demo window
+        // It is very useful to discover all the widgets available in ImGui
+        ImGui::ShowDemoWindow();
+    };
+
     // Declare your infinite update loop.
     ctx.update = [&]() {
-        ctx.background(p6::NamedColor::Red);
+        ctx.background(p6::NamedColor::Black);
 
         ctx.fill = {1, 1, 1, 1};
         ctx.square(
@@ -36,7 +52,7 @@ int main()
 
         ctx.fill = {0.75, 0, 0, 1};
         ctx.stroke_weight = 0.f;
-        listeBoids.update();
+        listeBoids.update(separation, cohesion, alignment);
         listeBoids.display(ctx);
 
         //b.updatePosition();
