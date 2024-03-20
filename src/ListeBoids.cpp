@@ -17,7 +17,7 @@ void ListeBoids::update(float separation, float cohesion, float alignment)
 {
     for (Boid& b : listeBoids)
     {
-        b.applySteeringForces(listeBoids, separation*FACTOR, cohesion*FACTOR, alignment*FACTOR);
+        b.applySteeringForces(listeBoids, separation * FACTOR, cohesion * FACTOR, alignment * FACTOR);
         b.updatePosition();
     }
 }

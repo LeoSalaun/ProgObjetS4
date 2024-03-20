@@ -18,9 +18,7 @@ Boid::Boid()
    color{ glm::vec3(rand01(), rand01(), rand01())} {}
 
 Boid::Boid(float wander)
- : position{vec((rand01() - 0.5) * 0.8, (rand01() - 0.5) * 0.8)},
-   direction{vec((rand01() - 0.5) * wander, (rand01() - 0.5) * wander)},
-   color{ glm::vec3(rand01(), rand01(), rand01())} {}
+    : position{vec((rand01() - 0.5) * 0.8, (rand01() - 0.5) * 0.8)}, direction{vec((rand01() - 0.5) * wander, (rand01() - 0.5) * wander)}, color{glm::vec3(rand01(), rand01(), rand01())} {}
 
 void Boid::display(p6::Context& ctx) const
 {
@@ -75,7 +73,8 @@ vec Boid::getDirection() const
     return direction;
 }
 
-void Boid::setWanderStrength(float wander) {
+void Boid::setWanderStrength(float wander)
+{
     direction *= wander;
 }
 
@@ -121,20 +120,21 @@ void Boid::calculateAlignmentForce(const std::vector<Boid>& boids, float alignme
         if (&otherBoid != this)
         {
             averageDirection += otherBoid.getDirection();
-        }  
+        }
     }
-     if (!boids.empty())
-        {
-            averageDirection /= static_cast<float>(boids.size());
-        }
-        if (glm::length(averageDirection) > 0)
-        {
-            direction += glm::normalize(averageDirection) * alignment;
-        }
+    if (!boids.empty())
+    {
+        averageDirection /= static_cast<float>(boids.size());
+    }
+    if (glm::length(averageDirection) > 0)
+    {
+        direction += glm::normalize(averageDirection) * alignment;
+    }
     direction += vec{0.f};
 }
 
-void Boid::applySteeringForces(const std::vector<Boid>& boids, float separation, float cohesion, float alignment) {
+void Boid::applySteeringForces(const std::vector<Boid>& boids, float separation, float cohesion, float alignment)
+{
     calculateSeparationForce(boids, separation);
     calculateCohesionForce(boids, cohesion);
     calculateAlignmentForce(boids, alignment);
