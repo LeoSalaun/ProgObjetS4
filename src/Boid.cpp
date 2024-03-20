@@ -3,12 +3,9 @@
 #include <cstdlib>
 #include <iostream>
 #include <vector>
+#include "glm/ext/quaternion_geometric.hpp"
 #include "glm/fwd.hpp"
 #include "p6/p6.h"
-
-const float SEPARATION_STRENGTH = 1.f / 100000.f;
-const float ALIGNMENT_STRENGTH  = 1.f / 100000.f;
-const float WANDER_STRENGTH     = 1.f / 100000.f;
 
 double rand01()
 {
@@ -19,11 +16,10 @@ double rand01()
 }
 
 Boid::Boid()
- : color     { glm::vec3(rand01(), rand01(), rand01())}
-{
-    direction = vec((rand01() - 0.5) * WANDER_STRENGTH, (rand01() - 0.5) * WANDER_STRENGTH);
-    position  = vec((rand01() - 0.5) * 0.8, (rand01() - 0.5) * 0.8);
-}
+    : position{vec((rand01() - 0.5) * 0.8, (rand01() - 0.5) * 0.8)}, direction{vec((rand01() - 0.5), (rand01() - 0.5))}, color{glm::vec3(rand01(), rand01(), rand01())} {}
+
+Boid::Boid(float wander)
+    : position{vec((rand01() - 0.5) * 0.8, (rand01() - 0.5) * 0.8)}, direction{vec((rand01() - 0.5) * wander, (rand01() - 0.5) * wander)}, color{glm::vec3(rand01(), rand01(), rand01())} {}
 
 void Boid::display(p6::Context& ctx) const
 {
@@ -33,33 +29,8 @@ void Boid::display(p6::Context& ctx) const
     );
 }
 
-vec Boid::CalculateAlignmentForce(const std::vector<Boid>& boids) const
+void Boid::updatePosition()
 {
-    vec averageDirection(0.0f);
-
-    for (const Boid& otherBoid : boids)
-    {
-        if (&otherBoid != this)
-        {
-            averageDirection += otherBoid.getDirection();
-        }  
-    }
-     if (!boids.empty())
-        {
-            averageDirection /= static_cast<float>(boids.size());
-        }
-        if (glm::length(averageDirection) > 0)
-        {
-            return glm::normalize(averageDirection) * ALIGNMENT_STRENGTH;
-        }
-    return vec{0.};
-}
-
-void Boid::updatePosition(const std::vector<Boid>& boids)
-{
-    vec alignmentForce = CalculateAlignmentForce(boids);
-    direction += alignmentForce;
-
     position += direction;
     if (position.x > 0.5)
         position.x -= 1.f;
@@ -86,7 +57,12 @@ vec Boid::getDirection() const
     return direction;
 }
 
-void Boid::CalculateSeparationForce(const std::vector<Boid>& listeBoids)
+void Boid::setWanderStrength(float wander)
+{
+    direction *= wander;
+}
+
+void Boid::calculateSeparationForce(const std::vector<Boid>& listeBoids, float separation)
 {
     vec totalForce = vec(0);
 
@@ -97,11 +73,51 @@ void Boid::CalculateSeparationForce(const std::vector<Boid>& listeBoids)
         float distance            = glm::distance(position, otherBoid.getPosition());
         vec   separationDirection = position - otherBoid.getPosition();
 
-        if (distance > 0)
+        if (distance > 0 && distance < 2)
         {
             totalForce += separationDirection / (distance);
         }
     }
-    direction += totalForce * SEPARATION_STRENGTH;
+    direction += glm::normalize(totalForce) * separation;
     // std::cout << totalForce[0] << " , " << totalForce[1] << std::endl;
 }
+
+vec Boid::calculateCohesionForce(const std::vector<Boid>& boids, float cohesion)
+{
+    vec averagePosition = vec(0, 0);
+    for (const Boid& b : boids)
+    {
+        averagePosition += b.getPosition();
+    }
+    averagePosition /= boids.size();
+    direction += glm::normalize(averagePosition) * cohesion;
+}
+
+vec Boid::calculateAlignmentForce(const std::vector<Boid>& boids, float alignment)
+{
+    vec averageDirection(0.0f);
+
+    for (const Boid& otherBoid : boids)
+    {
+        if (&otherBoid != this)
+        {
+            averageDirection += otherBoid.getDirection();
+        }
+    }
+    if (!boids.empty())
+    {
+        averageDirection /= static_cast<float>(boids.size());
+    }
+    if (glm::length(averageDirection) > 0)
+    {
+        direction += glm::normalize(averageDirection) * alignment;
+    }
+    direction += vec{0.f};
+}
+
+void Boid::applySteeringForces(const std::vector<Boid>& boids, float separation, float cohesion, float alignment)
+{
+    calculateSeparationForce(boids, separation);
+    calculateCohesionForce(boids, cohesion);
+    calculateAlignmentForce(boids, alignment);
+};
