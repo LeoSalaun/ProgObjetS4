@@ -1,6 +1,4 @@
 #include "ListeBoids.hpp"
-#include <iostream>
-#include <ostream>
 #include <vector>
 #include "Boid.hpp"
 
