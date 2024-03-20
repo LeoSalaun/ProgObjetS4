@@ -7,7 +7,7 @@
 #include "p6/p6.h"
 
 const float SEPARATION_STRENGTH = 1.f / 100000.f;
-const float ALIGNMENT_STRENGTH  = 1.f / 10.f;
+const float ALIGNMENT_STRENGTH  = 1.f / 100000.f;
 const float WANDER_STRENGTH     = 1.f / 100000.f;
 
 double rand01()

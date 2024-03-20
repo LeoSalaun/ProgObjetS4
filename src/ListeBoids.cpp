@@ -4,12 +4,12 @@
 #include <vector>
 #include "Boid.hpp"
 
-static constexpr float COHESION_STRENGTH { 1.f/ 1000000000.f};
+static constexpr float COHESION_STRENGTH { 1.f/ 1000.f};
 
 
 void ListeBoids::newBoid()
 {
-    Boid b;
+    Boid b{};
     listeBoids.push_back(b);
 }
 
