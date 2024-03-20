@@ -1,11 +1,9 @@
 #include <cstdlib>
 #define DOCTEST_CONFIG_IMPLEMENT
 #include "doctest/doctest.h"
-#include "p6/p6.h"
 #include "structures.cpp"
 #include "Boid.hpp"
 #include "ListeBoids.hpp"
-#include <vector>
 
 int main()
 {
@@ -19,7 +17,7 @@ int main()
 
     Boid b{};
     ListeBoids listeBoids{};
-    for (int i=0 ; i<10 ; i++) {
+    for (int i=0 ; i<60 ; i++) {
         listeBoids.addBoid(Boid{});
     }
    // listeBoids.addBoid(b);
