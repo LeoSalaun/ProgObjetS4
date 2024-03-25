@@ -17,7 +17,7 @@ int main()
 
     Boid b{};
     ListeBoids listeBoids{};
-    for (int i=0 ; i<60 ; i++) {
+    for (int i=0 ; i<5 ; i++) {
         listeBoids.addBoid(Boid{});
     }
    // listeBoids.addBoid(b);
