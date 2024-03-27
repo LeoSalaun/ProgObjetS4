@@ -17,21 +17,21 @@ int main()
 
     Boid b{};
     ListeBoids listeBoids{};
-    for (int i=0 ; i<5 ; i++) {
+    for (int i=0 ; i<60 ; i++) {
         listeBoids.addBoid(Boid{});
     }
    // listeBoids.addBoid(b);
 
     auto separation = 5.f;
-    auto cohesion = 5.f;
-    auto alignment = 5.f;
+    auto cohesion = .05f;
+    auto alignment = 50.f;
 
 
     ctx.imgui = [&]() {
         ImGui::Begin("Steering forces");
         ImGui::SliderFloat("Separation strength", &separation, 0.f, 10.f);
-        ImGui::SliderFloat("Cohesion strength", &cohesion, 0.f, 10.f);
-        ImGui::SliderFloat("Alignment strength", &alignment, 0.f, 10.f);
+        ImGui::SliderFloat("Cohesion strength", &cohesion, 0.f, .1f);
+        ImGui::SliderFloat("Alignment strength", &alignment, 0.f, 100.f);
         ImGui::End();
         // Show the official ImGui demo window
         // It is very useful to discover all the widgets available in ImGui

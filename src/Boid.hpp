@@ -17,9 +17,9 @@ public:
     vec       getDirection() const;
     void      setWanderStrength(float wander);
     //    const static int DIMENSION = 2;
-    void calculateSeparationForce(const std::vector<Boid>& boids, float separation);
-    void  calculateCohesionForce(const std::vector<Boid>& boids, float cohesion);
-    void  calculateAlignmentForce(const std::vector<Boid>& boids, float alignment);
+    vec calculateSeparationForce(const std::vector<Boid>& boids, float separation);
+    vec calculateCohesionForce(const std::vector<Boid>& boids, float cohesion);
+    vec calculateAlignmentForce(const std::vector<Boid>& boids, float alignment);
     void applySteeringForces(const std::vector<Boid>& boids, float separation, float cohesion, float alignment);
 
 private:
