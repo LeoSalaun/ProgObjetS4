@@ -7,7 +7,7 @@
 double rand01()
 {
     thread_local std::default_random_engine gen{std::random_device{}()};
-    thread_local auto                       distrib = std::uniform_real_distribution<double>{0.0, 1.0};
+    thread_local auto distrib = std::uniform_real_distribution<double>{0.0, 1.0};
 
     return distrib(gen);
 }
@@ -18,7 +18,7 @@ Boid::Boid()
    color{ glm::vec3(rand01(), rand01(), rand01())} {}
 
 Boid::Boid(float wander)
-    : position{vec((rand01() - 0.5) * 0.8, (rand01() - 0.5) * 0.8)}, direction{vec((rand01() - 0.5) * wander, (rand01() - 0.5) * wander)}, color{glm::vec3(rand01(), rand01(), rand01())} {}
+    : position{vec((rand01() - 0.5f) * 0.8f, (rand01() - 0.5f) * 0.8f)}, direction{vec((rand01() - 0.5f) * wander, (rand01() - 0.5f) * wander)}, color{glm::vec3(rand01(), rand01(), rand01())} {}
 
 void Boid::display(p6::Context& ctx) const
 {
@@ -48,13 +48,13 @@ void Boid::updatePosition()
     //std::cout << (rand01() - 0.5f) * 0.8f << std::endl;
 
     position += direction;
-    if (position.x > 0.5f)
+    if (position.x > 0.51f)
         position.x -= 1.f;
-    if (position.x < -0.5f)
+    if (position.x < -0.51f)
         position.x += 1.f;
-    if (position.y > 0.5f)
+    if (position.y > 0.51f)
         position.y -= 1.f;
-    if (position.y < -0.5f)
+    if (position.y < -0.51f)
         position.y += 1.f;
 }
 
@@ -101,7 +101,7 @@ void Boid::calculateSeparationForce(const std::vector<Boid>& listeBoids, float s
 
 void Boid::calculateCohesionForce(const std::vector<Boid>& boids, float cohesion)
 {
-    vec averagePosition = vec(0, 0);
+    vec averagePosition = vec(0.f, 0.f);
     for (const Boid& b : boids)
     {
         averagePosition += b.getPosition();
