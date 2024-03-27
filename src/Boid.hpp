@@ -8,19 +8,17 @@ using vec = glm::vec2;
 class Boid {
 public:
     Boid();
-    Boid(float wander);
+    explicit Boid(float wander);
 
     void      display(p6::Context& ctx) const;
     void      updatePosition();
     vec       getPosition() const;
     glm::vec3 getColor() const;
     vec       getDirection() const;
-    void      setWanderStrength(float wander);
-    //    const static int DIMENSION = 2;
-    vec calculateSeparationForce(const std::vector<Boid>& boids, float separation);
-    vec calculateCohesionForce(const std::vector<Boid>& boids, float cohesion);
-    vec calculateAlignmentForce(const std::vector<Boid>& boids, float alignment);
-    void applySteeringForces(const std::vector<Boid>& boids, float separation, float cohesion, float alignment);
+    vec       calculateSeparationForce(const std::vector<Boid>& boids, float separation);
+    vec       calculateCohesionForce(const std::vector<Boid>& boids, float cohesion);
+    vec       calculateAlignmentForce(const std::vector<Boid>& boids, float alignment);
+    void      applySteeringForces(const std::vector<Boid>& boids, float separation, float cohesion, float alignment);
 
 private:
     vec       position;

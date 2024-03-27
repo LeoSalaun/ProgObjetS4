@@ -31,24 +31,8 @@ void Boid::display(p6::Context& ctx) const
 
 void Boid::updatePosition()
 {
-    /*float sumDirection = 0.f;
-    for (size_t i=0 ; i<direction.length() ; i++) {
-        sumDirection += direction[i];
-    }
-    direction -= vec(sumDirection/direction.length());*/
-    //direction *= 0.001f;
-    // for (size_t i=0 ; i<direction.length() ; i++) {
-    //     if (direction[i] > 0.01f) {
-    //         direction /= (2*direction[i]);
-    //     }
-    // }
-    //direction = vec(0.001f);
-
-    // std::cout << direction[0] << " " << direction[1] << std::endl;
-
-    //std::cout << (rand01() - 0.5f) * 0.8f << std::endl;
-
     position += direction;
+
     if (position.x >  0.5f)
         position.x -= 1.f;
     if (position.x < -0.5f)
@@ -57,15 +41,6 @@ void Boid::updatePosition()
         position.y -= 1.f;
     if (position.y < -0.5f)
         position.y += 1.f;
-
-    // if (position.x >=  0.3f)
-    //     direction.x += 0.2f;
-    // if (position.x <= -0.3f)
-    //     direction.x += 0.2f;
-    // if (position.y >=  0.3f)
-    //     direction.y -= 0.2f;
-    // if (position.y <= -0.3f)
-    //     direction.y += 0.2f;
 }
 
 vec Boid::getPosition() const
@@ -83,10 +58,6 @@ vec Boid::getDirection() const
     return direction;
 }
 
-void Boid::setWanderStrength(float wander) {
-    direction *= wander;
-}
-
 vec Boid::calculateSeparationForce(const std::vector<Boid>& listeBoids, float separation)
 {
     vec totalForce = vec(0.f);
@@ -97,15 +68,11 @@ vec Boid::calculateSeparationForce(const std::vector<Boid>& listeBoids, float se
             continue;
         float distance            = glm::distance(position, otherBoid.getPosition());
         vec   separationDirection = position - otherBoid.getPosition();
-        //std::cout << "position : " << position[0] << " " << position[1] << std::endl;
-        //std::cout << distance << std::endl;
         if (distance > 0.f && distance < .05f) {
             totalForce += separationDirection / (distance);
         }
     }
     return totalForce * separation;
-    // std::cout << totalForce[0] << " , " << totalForce[1] << std::endl;
-    //std::cout << "separation : " << direction[0] << " " << direction[1] << std::endl;
 }
 
 vec Boid::calculateCohesionForce(const std::vector<Boid>& boids, float cohesion)
@@ -118,8 +85,7 @@ vec Boid::calculateCohesionForce(const std::vector<Boid>& boids, float cohesion)
             averagePosition += otherBoid.getPosition();
     }
     averagePosition /= boids.size();
-    return averagePosition-position * cohesion;
-    //std::cout << cohesion << std::endl;
+    return (averagePosition-position) * cohesion;
 }
 
 vec Boid::calculateAlignmentForce(const std::vector<Boid>& boids, float alignment)
@@ -149,5 +115,4 @@ void Boid::applySteeringForces(const std::vector<Boid>& boids, float separation,
                    + calculateAlignmentForce(boids, alignment);
     direction += glm::normalize(totalForce);
     direction *= 0.001f;
-    //std::cout << direction[0] << std::endl;
 };
