@@ -3,14 +3,17 @@
 #include "glm/fwd.hpp"
 #include "p6/p6.h"
 
-using vec = glm::vec2;
+#include "glimac/common.hpp"
+
+using vec = glm::vec3;
 
 class Boid {
 public:
     Boid();
     explicit Boid(float wander);
 
-    void      display(p6::Context& ctx) const;
+    void      display(glm::mat4 &ModelMatrix, glm::mat4 &ViewMatrix, glm::mat4 &MVMatrix, glm::mat4 &NormalMatrix, const glm::mat4 ProjMatrix,
+                      const GLint uMVPMatrix, const GLint uMVMatrix, const GLint uNormalMatrix) const;
     void      updatePosition();
     vec       getPosition() const;
     glm::vec3 getColor() const;
@@ -24,4 +27,5 @@ private:
     vec       position;
     glm::vec3 color;
     vec       direction;
+    std::vector<glimac::ShapeVertex> vertices;
 };
