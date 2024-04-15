@@ -7,7 +7,6 @@
 
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
-#include "glimac/common.hpp"
 #include "glimac/sphere_vertices.hpp"
 
 Boid::Boid()

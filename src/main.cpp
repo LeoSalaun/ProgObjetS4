@@ -85,7 +85,6 @@ int main()
 
     glm::vec3 kd{rand01(),rand01(),rand01()};
     glm::vec3 ks{rand01(),rand01(),rand01()};
-    float shininess{rand01()};
 
     auto separation = 5.f;
     auto cohesion = .05f;

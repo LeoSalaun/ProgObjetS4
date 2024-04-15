@@ -2,7 +2,7 @@
 #include <vector>
 #include "Boid.hpp"
 
-void ListeBoids::addBoid(Boid b)
+void ListeBoids::addBoid(Boid const &b)
 {
     listeBoids.push_back(b);
 }

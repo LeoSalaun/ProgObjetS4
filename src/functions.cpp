@@ -1,7 +1,5 @@
 #include "functions.hpp"
 #include <random>
-#include "glm/fwd.hpp"
-#include "glm/geometric.hpp"
 
 float rand01()
 {

@@ -12,8 +12,8 @@ public:
     Boid();
     explicit Boid(float wander);
 
-    void      display(glm::mat4 &ModelMatrix, glm::mat4 &ViewMatrix, glm::mat4 &MVMatrix, glm::mat4 &NormalMatrix, const glm::mat4 ProjMatrix,
-                      const GLint uMVPMatrix, const GLint uMVMatrix, const GLint uNormalMatrix) const;
+    void      display(glm::mat4 &ModelMatrix, glm::mat4 &ViewMatrix, glm::mat4 &MVMatrix, glm::mat4 &NormalMatrix, glm::mat4 ProjMatrix,
+                      GLint uMVPMatrix, GLint uMVMatrix, GLint uNormalMatrix) const;
     void      updatePosition();
     vec       getPosition() const;
     glm::vec3 getColor() const;
