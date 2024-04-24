@@ -12,14 +12,14 @@ class VAO {
     public:
         VAO();
         ~VAO();
-        VAO(const VAO & other) = delete;
-        VAO& operator=(const VAO & other) = delete;
-        VAO(VAO && other) noexcept;
-        VAO& operator=(VAO && other) noexcept;
+        // VAO(const VAO & other) = delete;
+        // VAO& operator=(const VAO & other) = delete;
+        // VAO(VAO && other) noexcept;
+        // VAO& operator=(VAO && other) noexcept;
 
         GLuint getId() const;
         void setId(const GLuint &newId);
 
-        void bind();
-        void unbind();
+        void bind() const;
+        void unbind() const;
 };

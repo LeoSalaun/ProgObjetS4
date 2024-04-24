@@ -4,8 +4,6 @@
 #include <glm/gtc/constants.hpp>
 #include "glm/fwd.hpp"
 #include "glm/ext/matrix_transform.hpp"
-#include "glm/fwd.hpp"
-#include <iostream>
 
 FreeflyCamera::FreeflyCamera()
 : m_Position(0.f), m_Phi(M_PI), m_Theta(0.f) {
@@ -20,11 +18,13 @@ void FreeflyCamera::computeDirectionVectors() {
 
 void FreeflyCamera::moveFront(float t) {
     m_Position -= t * m_FrontVector;
+    replaceCamera();
     computeDirectionVectors();
 }
 
 void FreeflyCamera::moveLeft(float t) {
     m_Position -= t * m_LeftVector;
+    replaceCamera();
     computeDirectionVectors();
 }
 
@@ -40,4 +40,27 @@ void FreeflyCamera::rotateUp(float degrees) {
 
 glm::mat4 FreeflyCamera::getViewMatrix() const {
     return glm::lookAt(m_Position, m_Position + m_FrontVector, m_UpVector);
+}
+
+void FreeflyCamera::replaceCamera() {
+    if (m_Position.x < -10.f) {
+        m_Position.x = -9.9f;
+    }
+    if (m_Position.x > 10.f) {
+        m_Position.x = 9.9f;
+    }
+
+    if (m_Position.y < -10.f) {
+        m_Position.y = -9.9f;
+    }
+    if (m_Position.y > 10.f) {
+        m_Position.y = 9.9f;
+    }
+
+    if (m_Position.z < -10.f) {
+        m_Position.z = -9.9f;
+    }
+    if (m_Position.z > 10.f) {
+        m_Position.z = 9.9f;
+    }
 }
