@@ -2,11 +2,11 @@
 
 in vec3 vPosition;
 in vec3 vNormal;
-// in vec2 vTextCoords;
+in vec2 vTextCoords;
 
-out vec3 fFragColor;
+out vec4 fFragColor;
 
-// uniform sampler2D uTexture;
+uniform sampler2D uTexture;
 
 uniform vec3      uKd;
 uniform vec3      uKs;
@@ -18,10 +18,10 @@ uniform vec3 uLightIntensity;
 vec3 blinnPhong();
 
 void main() {
-    // fFragColor = texture(uTexture, vTextCoords).xyz;
+    // fFragColor = vec4(texture(uTexture, vTextCoords).wxy * blinnPhong(),1.f);
     vec3 bp = blinnPhong();
-    // fFragColor = vec3(texture(uTexture, vTextCoords)[0] * bp[0], texture(uTexture, vTextCoords)[1] * bp[1], texture(uTexture, vTextCoords)[2] * bp[2]);
-    fFragColor = blinnPhong();
+    fFragColor = vec4(texture(uTexture, vTextCoords)[0] * bp[0], texture(uTexture, vTextCoords)[1] * bp[1], texture(uTexture, vTextCoords)[2] * bp[2], texture(uTexture, vTextCoords)[3]);
+    // fFragColor = blinnPhong();
 }
 
 vec3 blinnPhong() {

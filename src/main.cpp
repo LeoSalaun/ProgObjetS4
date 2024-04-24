@@ -1,29 +1,21 @@
 #include <cstdlib>
 #define DOCTEST_CONFIG_IMPLEMENT
 #include "doctest/doctest.h"
-#include "structures.cpp"
 #include "Boid.hpp"
 #include "ListeBoids.hpp"
 #include "functions.hpp"
+#include "Texture.hpp"
+#include "Model3D.hpp"
 
-#include "glimac/common.hpp"
 #include "glimac/sphere_vertices.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/fwd.hpp"
-#include "glm/gtc/type_ptr.hpp"
 #include "glm/matrix.hpp"
 #include <img/src/Image.h>
-#include <vector>
-#include "vbo.hpp"
-#include "vao.hpp"
 #include "glimac/FreeflyCamera.hpp"
 
 using namespace glimac;
-
-const GLuint VERTEX_ATTR_POSITION = 0;
-const GLuint VERTEX_ATTR_NORMAL = 1;
-const GLuint VERTEX_ATTR_TEXCOORDS = 2;
 
 int main()
 {
@@ -37,7 +29,7 @@ int main()
 
     const p6::Shader shader = p6::load_shader(
         "src/shaders/3D.vs.glsl",
-        "src/shaders/directionalLight.fs.glsl"
+        "src/shaders/allLights.fs.glsl"
     );
 
     ListeBoids listeBoids{};
@@ -45,46 +37,56 @@ int main()
         listeBoids.addBoid(Boid{});
     }
 
+    // GET UNIFORM VARIABLES
+
     GLint uMVPMatrix = glGetUniformLocation(shader.id(),"uMVPMatrix");
     GLint uMVMatrix = glGetUniformLocation(shader.id(),"uMVMatrix");
     GLint uNormalMatrix = glGetUniformLocation(shader.id(),"uNormalMatrix");
     GLint uTexture = glGetUniformLocation(shader.id(),"uTexture");
 
-    GLint uKd = glGetUniformLocation(shader.id(),"uKd");
-    GLint uKs = glGetUniformLocation(shader.id(),"uKs");
-    GLint uShininess = glGetUniformLocation(shader.id(),"uShininess");
-    GLint uLightDir_vs = glGetUniformLocation(shader.id(),"uLightDir_vs");
-    GLint uLightIntensity = glGetUniformLocation(shader.id(),"uLightIntensity");
+    // Calculate random materials for the lighting
+
+    glm::vec3 kd{rand01(),rand01(),rand01()};
+    glm::vec3 ks{rand01(),rand01(),rand01()};
+
+    GLint uKdCenter = glGetUniformLocation(shader.id(),"uKdCenter");
+    GLint uKsCenter = glGetUniformLocation(shader.id(),"uKsCenter");
+    GLint uShininessCenter = glGetUniformLocation(shader.id(),"uShininessCenter");
+    GLint uLightPosCenter = glGetUniformLocation(shader.id(),"uLightPosCenter");
+    GLint uLightIntensityCenter = glGetUniformLocation(shader.id(),"uLightIntensityCenter");
+
+    GLint uKdSelf = glGetUniformLocation(shader.id(),"uKdSelf");
+    GLint uKsSelf = glGetUniformLocation(shader.id(),"uKsSelf");
+    GLint uShininessSelf = glGetUniformLocation(shader.id(),"uShininessSelf");
+    GLint uLightPosSelf = glGetUniformLocation(shader.id(),"uLightPosSelf");
+    GLint uLightIntensitySelf = glGetUniformLocation(shader.id(),"uLightIntensitySelf");
+
+    // LOAD 3D MODELS
+
+    Model3D sphere{glimac::sphere_vertices(1.f, 64.f, 32.f)};
+    Model3D planet{loadOBJ("assets/models/planet.obj")};
+    Model3D ufo{loadOBJ("assets/models/ufo.obj")};
+    Model3D cube{loadOBJ("assets/models/cube.obj")};
+    Model3D star{loadOBJ("assets/models/star.obj")};
+
+    // LOAD TEXTURES
+
+    Texture SpaceMap("assets/textures/SpaceMap.jpg");
+    Texture MoonMap("assets/textures/MoonMap.jpg");
+    Texture Gold("assets/textures/gold.jpg");
+    Texture Metal("assets/textures/metal.jpg");
+    Texture Rainbow("assets/textures/rainbow.jpg");
+
+
 
     glEnable(GL_DEPTH_TEST);
 
-    VBO vbo;
-    VAO vao;
 
-    vbo.bind(GL_ARRAY_BUFFER);
-    
-    std::vector<ShapeVertex> vertices = glimac::sphere_vertices(1.f, 64.f, 32.f);
-
-    glBufferData(GL_ARRAY_BUFFER, static_cast<glm::int64>(vertices.size() * sizeof(ShapeVertex)), vertices.data(), GL_STATIC_DRAW);
-
-    vao.bind();
-
-    glEnableVertexAttribArray(VERTEX_ATTR_POSITION);
-    glEnableVertexAttribArray(VERTEX_ATTR_NORMAL);
-    glEnableVertexAttribArray(VERTEX_ATTR_TEXCOORDS);
-
-    glVertexAttribPointer(VERTEX_ATTR_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(ShapeVertex), (const GLvoid*)offsetof(ShapeVertex, position));
-    glVertexAttribPointer(VERTEX_ATTR_NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(ShapeVertex), (const GLvoid*)offsetof(ShapeVertex, normal));
-    glVertexAttribPointer(VERTEX_ATTR_TEXCOORDS, 2, GL_FLOAT, GL_FALSE, sizeof(ShapeVertex), (const GLvoid*)offsetof(ShapeVertex, texCoords));
-    
-    vbo.unbind(GL_ARRAY_BUFFER);
-    vao.unbind();
 
     FreeflyCamera camera;
     camera.moveFront(15.f);
 
-    glm::vec3 kd{rand01(),rand01(),rand01()};
-    glm::vec3 ks{rand01(),rand01(),rand01()};
+    // INTERFACE MANAGEMENT
 
     auto separation = 5.f;
     auto cohesion = .05f;
@@ -102,10 +104,12 @@ int main()
     // Declare your infinite update loop.
     ctx.update = [&]() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
-        vao.bind();
 
         shader.use();
+
+        glUniform1i(uTexture, 0);
+
+        // CAMERA MANAGEMENT
 
         if (ctx.key_is_pressed(GLFW_KEY_W)) camera.moveFront(-0.1f);
         if (ctx.key_is_pressed(GLFW_KEY_A)) camera.moveLeft (-0.1f);
@@ -117,39 +121,97 @@ int main()
             camera.rotateUp(ctx.mouse_delta().y*100.f);
         }
 
+
+
+        // APPLY LIGHTING
+        
         glm::mat4 ProjMatrix = glm::perspective(glm::radians(70.f), ctx.aspect_ratio(), 0.1f, 100.f);
         glm::mat4 ViewMatrix = camera.getViewMatrix();
-        glm::mat4 ModelMatrix = glm::mat4(1.f);
-        glm::mat4 MVMatrix = ViewMatrix*ModelMatrix;
-        glm::mat4 NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
+        glm::mat4 ModelMatrix;
 
-        glUniform3f(uKd, kd.x,kd.y,kd.z);
-        glUniform3f(uKs, ks.x,ks.y,ks.z);
-        glUniform1f(uShininess, 1.f);
-        glm::vec4 lightDir = ViewMatrix*glm::vec4(1.f, 1.f, 1.f,0.f);
-        glUniform3f(uLightDir_vs, lightDir.x, lightDir.y, lightDir.z);
-        glUniform3f(uLightIntensity, 1.f, 1.f, 1.f);
+        glUniform3f(uKdCenter, kd.x,kd.y,kd.z);
+        glUniform3f(uKsCenter, ks.x,ks.y,ks.z);
+        glUniform1f(uShininessCenter, 1.f);
+        glm::vec4 lightPos = ViewMatrix*glm::vec4(1.f, 1.f, 1.f, 1.f);
+        glUniform3f(uLightPosCenter, lightPos.x, lightPos.y, lightPos.z);
+        glUniform3f(uLightIntensityCenter, 15.f, 15.f, 15.f);
 
-        MVMatrix = glm::rotate(MVMatrix, ctx.time(), {0.f, 1.f, 0.f});
-        NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
-        glUniformMatrix4fv(uMVPMatrix, 1.f, GL_FALSE, glm::value_ptr(ProjMatrix*MVMatrix));
-        glUniformMatrix4fv(uMVMatrix, 1.f, GL_FALSE, glm::value_ptr(MVMatrix));
-        glUniformMatrix4fv(uNormalMatrix, 1.f, GL_FALSE, glm::value_ptr(NormalMatrix));
+        glUniform3f(uKdSelf, kd.x,kd.y,kd.z);
+        glUniform3f(uKsSelf, ks.x,ks.y,ks.z);
+        glUniform1f(uShininessSelf, 1.f);
+        lightPos = glm::vec4(1.f, 1.f, 1.f,1.f);
+        glUniform3f(uLightPosSelf, lightPos.x, lightPos.y, lightPos.z);
+        glUniform3f(uLightIntensitySelf, 25.f, 25.f, 25.f);
 
-        // ctx.fill = {1, 1, 1, 1};
-        // ctx.square(
-        //     p6::Center{0,0},
-        //     p6::Radius{0.52f}
-        // );
 
-        // ctx.fill = {0.75, 0, 0, 1};
-        // ctx.stroke_weight = 0.f;
+
+
+        // DRAW OBJECTS
+
+        // DRAW CUBE
+
+        Gold.bind();
+
+        ModelMatrix = glm::mat4(1.f);
+        ModelMatrix = glm::scale(ModelMatrix, glm::vec3(0.23f));
+
+        cube.drawObject(ViewMatrix, ModelMatrix, ProjMatrix, uMVPMatrix, uMVMatrix, uNormalMatrix);
+
+        Gold.unbind();
+
+        // DRAW ARPENTEUR
+
+        Metal.bind();
+
+        ModelMatrix = glm::inverse(ViewMatrix);
+        ModelMatrix = glm::translate(ModelMatrix, vec(0.f,-2.f,-5.f));
+        ModelMatrix = glm::rotate(ModelMatrix, glm::radians(180.f), {1.f, 0.f, 0.f});
+
+        ufo.drawObject(ViewMatrix, ModelMatrix, ProjMatrix, uMVPMatrix, uMVMatrix, uNormalMatrix);
+
+        Metal.unbind();
+
+        // DRAW PLANETS THAT ROTATE AROUND THE BOIDS
+
+        MoonMap.bind();
+
+        ModelMatrix = glm::mat4(1.f);
+        ModelMatrix = glm::rotate(ModelMatrix, ctx.time()/5.f, {0.f, 1.f, 0.f});
+        ModelMatrix = glm::translate(ModelMatrix, vec(40.f,0.f,0.f));
+        ModelMatrix = glm::scale(ModelMatrix, glm::vec3(5.f));
+
+        planet.drawObject(ViewMatrix, ModelMatrix, ProjMatrix, uMVPMatrix, uMVMatrix, uNormalMatrix);
+
+        ModelMatrix = glm::mat4(1.f);
+        ModelMatrix = glm::rotate(ModelMatrix, 90.f, {1.f, 0.f, 0.5f});
+        ModelMatrix = glm::rotate(ModelMatrix, ctx.time()/5.f, {0.f, 1.f, 0.f});
+        ModelMatrix = glm::translate(ModelMatrix, vec(30.f,0.f,0.f));
+        ModelMatrix = glm::scale(ModelMatrix, glm::vec3(5.f));
+
+        planet.drawObject(ViewMatrix, ModelMatrix, ProjMatrix, uMVPMatrix, uMVMatrix, uNormalMatrix);
+
+        MoonMap.unbind();
+
+        // DRAW BACKGROUND
+
+        SpaceMap.bind();
+
+        ModelMatrix = glm::mat4(1.f);
+        ModelMatrix = glm::scale(ModelMatrix, glm::vec3(50.f));
+        ModelMatrix = glm::rotate(ModelMatrix, ctx.time()/20.f, {0.f, 1.f, 0.5f});
+
+        sphere.drawObject(ViewMatrix, ModelMatrix, ProjMatrix, uMVPMatrix, uMVMatrix, uNormalMatrix);
+
+        SpaceMap.unbind();
+
+        // DRAW BOIDS
+
+        Rainbow.bind();
+
         listeBoids.update(separation, cohesion, alignment);
-        listeBoids.display(ModelMatrix, ViewMatrix, MVMatrix, NormalMatrix, ProjMatrix, uMVPMatrix, uMVMatrix, uNormalMatrix);
+        listeBoids.display(ModelMatrix, ViewMatrix, ProjMatrix, uMVPMatrix, uMVMatrix, uNormalMatrix, star);
 
-        glDrawArrays(GL_TRIANGLES, 0, static_cast<int>(vertices.size()));
-
-        vao.unbind();
+        Rainbow.unbind();
     };
 
     // Should be done last. It starts the infinite loop.

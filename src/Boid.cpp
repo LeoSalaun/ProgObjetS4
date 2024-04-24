@@ -1,4 +1,5 @@
 #include "Boid.hpp"
+#include "Model3D.hpp"
 #include "functions.hpp"
 #include <vector>
 #include "glm/fwd.hpp"
@@ -6,52 +7,33 @@
 
 
 #include "glm/ext/matrix_transform.hpp"
-#include "glm/gtc/type_ptr.hpp"
-#include "glimac/sphere_vertices.hpp"
 
 Boid::Boid()
  : position{vec((rand01() - 0.5f) * 0.8f, (rand01() - 0.5f) * 0.8f, (rand01() - 0.5f) * 0.8f)},
    color{ glm::vec3(rand01(), rand01(), rand01())},
-   direction{vec((rand01() - 0.5f) * 0.001f, (rand01() - 0.5f) * 0.001f, (rand01() - 0.5f) * 0.001f)},
-   vertices{glimac::sphere_vertices(1.f, 64.f, 32.f)} {}
+   direction{vec((rand01() - 0.5f) * 0.001f, (rand01() - 0.5f) * 0.001f, (rand01() - 0.5f) * 0.001f)}
+   {}
 
-Boid::Boid(float wander)
- : position{vec((rand01() - 0.5f) * 0.8f, (rand01() - 0.5f) * 0.8f, (rand01() - 0.5f) * 0.8f)},
-   color{ glm::vec3(rand01(), rand01(), rand01())},
-   direction{vec((rand01() - 0.5f) * wander, (rand01() - 0.5f) * wander, (rand01() - 0.5f) * wander)},
-   vertices{glimac::sphere_vertices(1.f, 64.f, 32.f)}  {}
-
-void Boid::display(glm::mat4 &ModelMatrix, glm::mat4 &ViewMatrix, glm::mat4 &MVMatrix, glm::mat4 &NormalMatrix, const glm::mat4 ProjMatrix,
-                   const GLint uMVPMatrix, const GLint uMVMatrix, const GLint uNormalMatrix) const
+void Boid::display(glm::mat4 &ModelMatrix, glm::mat4 &ViewMatrix, glm::mat4 &ProjMatrix,
+                   const GLint uMVPMatrix, const GLint uMVMatrix, const GLint uNormalMatrix, Model3D &model) const
 {
-    // ctx.circle(
-    //     p6::Center{position[0], position[1]},
-    //     p6::Radius{0.02f}
-    // );
-
-
+    // glm::vec3 normalizedDirection = glm::normalize(direction);
+    // glm::vec3 up = glm::vec3{0.f, 1.f, 0.f};
+    // glm::vec3 axis = glm::normalize(glm::cross(normalizedDirection, up));
+    // float angle = glm::degrees(acos(glm::dot(up, normalizedDirection)));         EFFECTIVE CALCULATIONS FOR A ROTATION MATRIX, HOWEVER IS DOES NOT LOOK GOOD WITH OUR BOIDS
 
 
     ModelMatrix = glm::mat4(1.f);
-
-    ModelMatrix = glm::translate(ModelMatrix, {20.f*position.x, 20.f*position.y, 20.f*position.z});
-    ModelMatrix = glm::scale(ModelMatrix, glm::vec3(0.2f));
-
-    MVMatrix = ViewMatrix*ModelMatrix;
-    NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
-
-    glUniformMatrix4fv(uMVPMatrix, 1.f, GL_FALSE, glm::value_ptr(ProjMatrix*MVMatrix));
-    glUniformMatrix4fv(uMVMatrix, 1.f, GL_FALSE, glm::value_ptr(MVMatrix));
-    glUniformMatrix4fv(uNormalMatrix, 1.f, GL_FALSE, glm::value_ptr(NormalMatrix));
-
-    glDrawArrays(GL_TRIANGLES, 0, static_cast<int>(vertices.size()));
+    ModelMatrix = glm::translate(ModelMatrix, {20.f*position.x, 20.f*position.y, 20.f*position.z}); // CALCULATE TRANSLATION MATRIX
+    //ModelMatrix = glm::rotate(ModelMatrix, angle, axis);
+    model.drawObject(ViewMatrix, ModelMatrix, ProjMatrix, uMVPMatrix, uMVMatrix, uNormalMatrix); // DRAW
 }
 
 void Boid::updatePosition()
 {
     position += direction;
 
-    if (position.x > 0.5f)
+    if (position.x >  0.5f) // REPLACE THE BOID SO THAT IT REMAINS IN THE CUBE
         position.x -= 1.f;
     if (position.x < -0.5f)
         position.x += 1.f;

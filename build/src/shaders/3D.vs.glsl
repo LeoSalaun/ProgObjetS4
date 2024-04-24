@@ -6,7 +6,7 @@ layout(location = 2) in vec2 aVertexTexCoords;
 
 out vec3 vPosition;
 out vec3 vNormal;
-// out vec2 vTextCoords;
+out vec2 vTextCoords;
 
 uniform mat4 uMVPMatrix;
 uniform mat4 uMVMatrix;
@@ -15,6 +15,6 @@ uniform mat4 uNormalMatrix;
 void main() {
     vPosition = vec3(uMVMatrix*vec4(aVertexPosition, 1.));
     vNormal = vec3(uNormalMatrix*vec4(aVertexNormal, 0.));
-    // vTextCoords = aVertexTexCoords;
+    vTextCoords = aVertexTexCoords;
     gl_Position = uMVPMatrix * vec4(aVertexPosition, 1.);
 }
