@@ -24,7 +24,7 @@ int main()
         return EXIT_FAILURE;
 
     // Actual application code
-    auto ctx = p6::Context{{.title = "Les boids ils sont partout, dans les villes, les campagnes, sur les réseaux sociaaaauuuuux..."}};
+    auto ctx = p6::Context{{.title = "Astéboïdes !!!"}};
     ctx.maximize_window();
 
     const p6::Shader shader = p6::load_shader(
