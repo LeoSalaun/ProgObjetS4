@@ -1,46 +1,60 @@
 #include "Boid.hpp"
-#include "functions.hpp"
+#include <cstdlib> // Pour rand()
+#include <ctime>   // Pour time()
 #include <vector>
+#include "functions.hpp"
+#include "glimac/sphere_vertices.hpp"
+#include "glm/ext/matrix_transform.hpp"
 #include "glm/fwd.hpp"
 #include "glm/geometric.hpp"
-
-
-#include "glm/ext/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
-#include "glimac/sphere_vertices.hpp"
 
 Boid::Boid()
- : position{vec((rand01() - 0.5f) * 0.8f, (rand01() - 0.5f) * 0.8f, (rand01() - 0.5f) * 0.8f)},
-   color{ glm::vec3(rand01(), rand01(), rand01())},
-   direction{vec((rand01() - 0.5f) * 0.001f, (rand01() - 0.5f) * 0.001f, (rand01() - 0.5f) * 0.001f)},
-   vertices{glimac::sphere_vertices(1.f, 64.f, 32.f)} {}
+    : position{vec((rand01() - 0.5f) * 0.8f, (rand01() - 0.5f) * 0.8f, (rand01() - 0.5f) * 0.8f)},
+    //    color{ glm::vec3(rand01(), rand01(), rand01())},
+    direction{vec((rand01() - 0.5f) * 0.001f, (rand01() - 0.5f) * 0.001f, (rand01() - 0.5f) * 0.001f)}
+    , vertices{glimac::sphere_vertices(1.f, 64.f, 32.f)}
+    {
+        // Nuances aléatoires  avec BERNOULLI
+        float probability = 0.5f; // Probabilité d'accentuer la composante rouge
+        srand(time(nullptr));
+
+        // Comparaison valeurs à la probabilité p de Bernoulli
+
+
+        float r = (rand() / (RAND_MAX + 1.0f)) < probability ? (rand() / (RAND_MAX + 1.0f)) : (rand() / (RAND_MAX + 1.0f)) * 0.5f; // Rouge
+        float g = (rand() / (RAND_MAX + 1.0f)) < probability ? (rand() / (RAND_MAX + 1.0f)) : (rand() / (RAND_MAX + 1.0f)) * 0.5f; // Vert
+        float b = (rand() / (RAND_MAX + 1.0f)) < probability ? (rand() / (RAND_MAX + 1.0f)) : (rand() / (RAND_MAX + 1.0f)) * 0.5f; // Bleu
+    
+        // Normaliser les valeurs de couleur pour qu'elles soient dans l'intervalle [0, 1]
+        r = std::clamp(r, 0.0f, 1.0f);
+        g = std::clamp(g, 0.0f, 1.0f);
+        b = std::clamp(b, 0.0f, 1.0f);
+    
+        // std::cout<<color[0];
+        // std::cout<<color[1];
+        // std::cout<<color[2];
+}
 
 Boid::Boid(float wander)
- : position{vec((rand01() - 0.5f) * 0.8f, (rand01() - 0.5f) * 0.8f, (rand01() - 0.5f) * 0.8f)},
-   color{ glm::vec3(rand01(), rand01(), rand01())},
-   direction{vec((rand01() - 0.5f) * wander, (rand01() - 0.5f) * wander, (rand01() - 0.5f) * wander)},
-   vertices{glimac::sphere_vertices(1.f, 64.f, 32.f)}  {}
+    : position{vec((rand01() - 0.5f) * 0.8f, (rand01() - 0.5f) * 0.8f, (rand01() - 0.5f) * 0.8f)}, color{glm::vec3(rand01(), rand01(), rand01())}, direction{vec((rand01() - 0.5f) * wander, (rand01() - 0.5f) * wander, (rand01() - 0.5f) * wander)}, vertices{glimac::sphere_vertices(1.f, 64.f, 32.f)} {}
 
-void Boid::display(glm::mat4 &ModelMatrix, glm::mat4 &ViewMatrix, glm::mat4 &MVMatrix, glm::mat4 &NormalMatrix, const glm::mat4 ProjMatrix,
-                   const GLint uMVPMatrix, const GLint uMVMatrix, const GLint uNormalMatrix) const
+void Boid::display(glm::mat4& ModelMatrix, glm::mat4& ViewMatrix, glm::mat4& MVMatrix, glm::mat4& NormalMatrix, const glm::mat4 ProjMatrix, const GLint uMVPMatrix, const GLint uMVMatrix, const GLint uNormalMatrix) const
 {
     // ctx.circle(
     //     p6::Center{position[0], position[1]},
     //     p6::Radius{0.02f}
     // );
 
-
-
-
     ModelMatrix = glm::mat4(1.f);
 
-    ModelMatrix = glm::translate(ModelMatrix, {20.f*position.x, 20.f*position.y, 20.f*position.z});
+    ModelMatrix = glm::translate(ModelMatrix, {20.f * position.x, 20.f * position.y, 20.f * position.z});
     ModelMatrix = glm::scale(ModelMatrix, glm::vec3(0.2f));
 
-    MVMatrix = ViewMatrix*ModelMatrix;
+    MVMatrix     = ViewMatrix * ModelMatrix;
     NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
 
-    glUniformMatrix4fv(uMVPMatrix, 1.f, GL_FALSE, glm::value_ptr(ProjMatrix*MVMatrix));
+    glUniformMatrix4fv(uMVPMatrix, 1.f, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
     glUniformMatrix4fv(uMVMatrix, 1.f, GL_FALSE, glm::value_ptr(MVMatrix));
     glUniformMatrix4fv(uNormalMatrix, 1.f, GL_FALSE, glm::value_ptr(NormalMatrix));
 
@@ -56,12 +70,12 @@ void Boid::updatePosition()
     if (position.x < -0.5f)
         position.x += 1.f;
 
-    if (position.y >  0.5f)
+    if (position.y > 0.5f)
         position.y -= 1.f;
     if (position.y < -0.5f)
         position.y += 1.f;
-    
-    if (position.z >  0.5f)
+
+    if (position.z > 0.5f)
         position.z -= 1.f;
     if (position.z < -0.5f)
         position.z += 1.f;
