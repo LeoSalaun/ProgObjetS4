@@ -75,6 +75,7 @@ int main()
     Texture MoonMap("assets/textures/MoonMap.jpg");
     Texture Gold("assets/textures/gold.jpg");
     Texture Metal("assets/textures/metal.jpg");
+    Texture Rainbow("assets/textures/rainbow.jpg");
 
 
 
@@ -133,7 +134,7 @@ int main()
         glUniform1f(uShininessCenter, 1.f);
         glm::vec4 lightPos = ViewMatrix*glm::vec4(1.f, 1.f, 1.f, 1.f);
         glUniform3f(uLightPosCenter, lightPos.x, lightPos.y, lightPos.z);
-        glUniform3f(uLightIntensityCenter, 25.f, 25.f, 25.f);
+        glUniform3f(uLightIntensityCenter, 15.f, 15.f, 15.f);
 
         glUniform3f(uKdSelf, kd.x,kd.y,kd.z);
         glUniform3f(uKsSelf, ks.x,ks.y,ks.z);
@@ -205,10 +206,12 @@ int main()
 
         // DRAW BOIDS
 
+        Rainbow.bind();
+
         listeBoids.update(separation, cohesion, alignment);
-        MoonMap.bind();
         listeBoids.display(ModelMatrix, ViewMatrix, ProjMatrix, uMVPMatrix, uMVMatrix, uNormalMatrix, star);
-        MoonMap.unbind();
+
+        Rainbow.unbind();
     };
 
     // Should be done last. It starts the infinite loop.
