@@ -107,7 +107,7 @@ std::vector<int> generateBernoulliSchema(double probaSuccess, int essaie) {
 
 //Loi exponentielle
 double generateExponential(double lambda) {
-    double u = static_cast<double>(rand01()) / RAND_MAX; // Générer un nombre aléatoire U entre 0 et 1
+    double u = rand01(); // Générer un nombre aléatoire U entre 0 et 1
     return -log(1 - u) / lambda; // Utiliser la fonction inverse de la CDF exponentielle
 }
 
