@@ -1,4 +1,7 @@
 #include <cstdlib>
+#include <iostream>
+#include <ostream>
+#include "glm/trigonometric.hpp"
 #define DOCTEST_CONFIG_IMPLEMENT
 #include "doctest/doctest.h"
 #include "Boid.hpp"
@@ -74,10 +77,14 @@ int main()
     Model3D ufo{loadOBJ("assets/models/ufo.obj")};
     Model3D cube{loadOBJ("assets/models/cube.obj")};
     Model3D star{loadOBJ("assets/models/star.obj")};
+    Model3D solrock{loadOBJ("assets/models/Solrock.obj")};
+    Model3D lunatone{loadOBJ("assets/models/Lunatone.obj")};
 
     // LOAD TEXTURES
 
     Texture SpaceMap("assets/textures/SpaceMap.jpg");
+    Texture SunMap("assets/textures/SunMap.jpg");
+    Texture PlanetMap("assets/textures/PlanetMap.jpg");
     Texture MoonMap("assets/textures/MoonMap.jpg");
     Texture Gold("assets/textures/gold.jpg");
     Texture Metal("assets/textures/metal.jpg");
@@ -92,6 +99,34 @@ int main()
     FreeflyCamera camera;
     camera.moveFront(15.f);
 
+
+    // MARKOV CHAIN
+
+
+    glm::mat4 markovMatrixSun{glm::vec4{ .6f,.05f,.25f, .2f},
+                              glm::vec4{ .0f, .9f,.15f,.35f},
+                              glm::vec4{.25f, .0f,.55f, .0f},
+                              glm::vec4{.15f,.05f, .0f,.45f}};
+
+    glm::mat4 markovMatrixMoon{glm::vec4{ .3f, .0f,.8f,.5f},
+                               glm::vec4{.16f,.15f,.1f,.0f},
+                               glm::vec4{.14f,.15f,.1f,.0f},
+                               glm::vec4{ .4f, .7f,.0f,.5f}};
+
+    glm::vec4 stateSun{0.f,0.f,1.f,0.f};
+    glm::vec4 stateMoon{1.f,0.f,0.f,0.f};
+
+    glm::vec2 markovPositionSun{0.f,0.f};
+    glm::vec2 markovPositionMoon{0.f,0.f};
+
+
+
+
+    float frame = 0;
+
+
+
+
     // INTERFACE MANAGEMENT
 
     auto separation = 5.f;
@@ -104,7 +139,6 @@ int main()
         ImGui::SliderFloat("Cohesion strength", &cohesion, 0.f, .1f);
         ImGui::SliderFloat("Alignment strength", &alignment, 0.f, 100.f);
         ImGui::End();
-        ImGui::ShowDemoWindow();
     };
 
     // Declare your infinite update loop.
@@ -114,6 +148,8 @@ int main()
         shader.use();
 
         glUniform1i(uTexture, 0);
+
+        frame++;
 
         // CAMERA MANAGEMENT
 
@@ -129,18 +165,68 @@ int main()
 
 
 
-        // APPLY LIGHTING
+        // CREATE MATRIX
         
         glm::mat4 ProjMatrix = glm::perspective(glm::radians(70.f), ctx.aspect_ratio(), 0.1f, 100.f);
         glm::mat4 ViewMatrix = camera.getViewMatrix();
         glm::mat4 ModelMatrix;
 
-        glUniform3f(uKdCenter, kd.x,kd.y,kd.z);
+
+
+
+        // DRAW OBJECTS
+
+        // DRAW SUN AND MOON
+
+        // SUN
+
+        SunMap.bind();
+
+        if (static_cast<int>(frame) % 20 == 0) {
+            calculateMarkovState(stateSun, markovMatrixSun);
+        }
+        markovPositionSun.x += stateSun[0];
+        markovPositionSun.x -= stateSun[1];
+        markovPositionSun.y += stateSun[2];
+        markovPositionSun.y -= stateSun[3];
+        
+        ModelMatrix = glm::mat4(1.f);
+        ModelMatrix = glm::rotate(ModelMatrix, markovPositionSun.x/100.f, {0.f, 1.f, 0.f});
+        ModelMatrix = glm::rotate(ModelMatrix, markovPositionSun.y/100.f, {0.f, 0.f, 1.f});
+        ModelMatrix = glm::translate(ModelMatrix, vec(40.f,0.f,0.f));
+        ModelMatrix = glm::scale(ModelMatrix, glm::vec3(.2f));
+        ModelMatrix = glm::rotate(ModelMatrix, glm::radians(90.f), {0.f, 1.f, 0.f});
+
+        solrock.drawObject(ViewMatrix, ModelMatrix, ProjMatrix, uMVPMatrix, uMVMatrix, uNormalMatrix);
+
+        glUniform3f(uKdCenter, kd.x,kd.y,kd.z);                         // APPLY LIGHTING TO SUN
         glUniform3f(uKsCenter, ks.x,ks.y,ks.z);
         glUniform1f(uShininessCenter, 1.f);
-        glm::vec4 lightPos = ViewMatrix*glm::vec4(1.f, 1.f, 1.f, 1.f);
+        glm::vec4 lightPos = ViewMatrix*glm::translate(ModelMatrix, vec(0.f,55.f,0.f))*glm::vec4(1.f, 1.f, 1.f, 1.f);
         glUniform3f(uLightPosCenter, lightPos.x, lightPos.y, lightPos.z);
-        glUniform3f(uLightIntensityCenter, 15.f, 15.f, 15.f);
+        glUniform3f(uLightIntensityCenter, 500.f, 500.f, 500.f);
+
+        SunMap.unbind();
+
+        // MOON
+
+        MoonMap.bind();
+
+        if (static_cast<int>(frame) % 20 == 0) {
+            calculateMarkovState(stateMoon, markovMatrixMoon);
+        }
+        markovPositionMoon.x += stateMoon[0];
+        markovPositionMoon.x -= stateMoon[1];
+        markovPositionMoon.y += stateMoon[2];
+        markovPositionMoon.y -= stateMoon[3];
+
+        ModelMatrix = glm::mat4(1.f);
+        ModelMatrix = glm::rotate(ModelMatrix, markovPositionMoon.x/100.f, {0.f, 1.f, 0.f});
+        ModelMatrix = glm::rotate(ModelMatrix, markovPositionMoon.y/100.f, {0.f, 0.f, 1.f});
+        ModelMatrix = glm::translate(ModelMatrix, vec(40.f,0.f,0.f));
+        ModelMatrix = glm::scale(ModelMatrix, glm::vec3(.2f));
+
+        lunatone.drawObject(ViewMatrix, ModelMatrix, ProjMatrix, uMVPMatrix, uMVMatrix, uNormalMatrix);
 
         glUniform3f(uKdSelf, kd.x,kd.y,kd.z);
         glUniform3f(uKsSelf, ks.x,ks.y,ks.z);
@@ -149,10 +235,7 @@ int main()
         glUniform3f(uLightPosSelf, lightPos.x, lightPos.y, lightPos.z);
         glUniform3f(uLightIntensitySelf, 25.f, 25.f, 25.f);
 
-
-
-
-        // DRAW OBJECTS
+        MoonMap.unbind();
 
         // DRAW CUBE
 
@@ -172,6 +255,7 @@ int main()
         ModelMatrix = glm::inverse(ViewMatrix);
         ModelMatrix = glm::translate(ModelMatrix, vec(0.f,-2.f,-5.f));
         ModelMatrix = glm::rotate(ModelMatrix, glm::radians(180.f), {1.f, 0.f, 0.f});
+        ModelMatrix = glm::rotate(ModelMatrix, glm::radians(90.f), {0.f, 1.f, 0.f});
 
         ufo.drawObject(ViewMatrix, ModelMatrix, ProjMatrix, uMVPMatrix, uMVMatrix, uNormalMatrix);
 
@@ -179,24 +263,24 @@ int main()
 
         // DRAW PLANETS THAT ROTATE AROUND THE BOIDS
 
-        MoonMap.bind();
+        PlanetMap.bind();
 
         ModelMatrix = glm::mat4(1.f);
-        ModelMatrix = glm::rotate(ModelMatrix, ctx.time()/5.f, {0.f, 1.f, 0.f});
-        ModelMatrix = glm::translate(ModelMatrix, vec(40.f,0.f,0.f));
-        ModelMatrix = glm::scale(ModelMatrix, glm::vec3(5.f));
-
-        planet.drawObject(ViewMatrix, ModelMatrix, ProjMatrix, uMVPMatrix, uMVMatrix, uNormalMatrix);
-
-        ModelMatrix = glm::mat4(1.f);
-        ModelMatrix = glm::rotate(ModelMatrix, 90.f, {1.f, 0.f, 0.5f});
-        ModelMatrix = glm::rotate(ModelMatrix, ctx.time()/5.f, {0.f, 1.f, 0.f});
+        ModelMatrix = glm::rotate(ModelMatrix, glm::radians(60.f), {0.f, 0.f, 11.f});
+        ModelMatrix = glm::rotate(ModelMatrix, glm::radians(frame/2.f), {0.f, 1.f, 0.f});
         ModelMatrix = glm::translate(ModelMatrix, vec(30.f,0.f,0.f));
         ModelMatrix = glm::scale(ModelMatrix, glm::vec3(5.f));
 
         planet.drawObject(ViewMatrix, ModelMatrix, ProjMatrix, uMVPMatrix, uMVMatrix, uNormalMatrix);
 
-        MoonMap.unbind();
+        ModelMatrix = glm::mat4(1.f);
+        ModelMatrix = glm::rotate(ModelMatrix, glm::radians(frame/2.f), {0.f, 1.f, 0.f});
+        ModelMatrix = glm::translate(ModelMatrix, vec(20.f,0.f,0.f));
+        ModelMatrix = glm::scale(ModelMatrix, glm::vec3(5.f));
+
+        planet.drawObject(ViewMatrix, ModelMatrix, ProjMatrix, uMVPMatrix, uMVMatrix, uNormalMatrix);
+
+        PlanetMap.unbind();
 
         // DRAW BACKGROUND
 
@@ -204,7 +288,7 @@ int main()
 
         ModelMatrix = glm::mat4(1.f);
         ModelMatrix = glm::scale(ModelMatrix, glm::vec3(50.f));
-        ModelMatrix = glm::rotate(ModelMatrix, ctx.time()/20.f, {0.f, 1.f, 0.5f});
+        ModelMatrix = glm::rotate(ModelMatrix, glm::radians(frame/40.f), {0.f, 1.f, 0.5f});
 
         sphere.drawObject(ViewMatrix, ModelMatrix, ProjMatrix, uMVPMatrix, uMVMatrix, uNormalMatrix);
 

@@ -5,6 +5,7 @@
 #include <vector>
 #include <cstdlib> // pour rand()
 #include <ctime> 
+#include "glm/ext/quaternion_geometric.hpp"
 
 float rand01()
 {
@@ -140,4 +141,35 @@ double laplaceRandom(double mu, double b) {
     double p = static_cast<double>(rand01()) / RAND_MAX; // Génère un nombre aléatoire uniforme entre 0 et 1
     int sgn = (p < 0.5) ? -1 : 1; // Fonction signe basée sur p
     return mu - b * sgn * log(1 - 2 * fabs(p - 0.5));
+}
+
+void calculateMarkovState(glm::vec4 &currentState, glm::mat4 matrix) {
+    glm::vec4 newProba = matrix*currentState;
+
+    float randomValue = rand01();
+    float randomSum = 0.f;
+    int state = 0;
+
+    for (state = 0; state < 4; ++state) {
+        randomSum += newProba[state];
+        if (randomValue <= randomSum) {
+            break;
+        }
+    }
+
+    
+    // std::cout << state << " " << randomSum << std::endl;
+    // std::cout << newProba[0] << " " << newProba[1]  << " " << newProba[2]  << " " << newProba[3] << std::endl;
+
+    switch (state) {
+        case 0  : currentState = {1.f, 0.f, 0.f, 0.f};
+                  break;
+        case 1  : currentState = {0.f, 1.f, 0.f, 0.f};
+                  break;
+        case 2  : currentState = {0.f, 0.f, 1.f, 0.f};
+                  break;
+        case 3  : currentState = {0.f, 0.f, 0.f, 1.f};
+                  break;
+        default : break;
+    }
 }

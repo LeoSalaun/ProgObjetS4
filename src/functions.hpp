@@ -6,7 +6,6 @@
 #include "glimac/common.hpp"
 
 
-
 #include "vbo.hpp"
 #include "vao.hpp"
 
@@ -30,3 +29,5 @@ struct Object3D{
 Object3D loadOBJ(const char * path);
 
 void enableVertex(VBO &vbo, VAO &vao,  std::vector<glimac::ShapeVertex> vertices);
+
+void calculateMarkovState(glm::vec4 &currentState, glm::mat4 matrix);
