@@ -8,19 +8,19 @@ VBO::~VBO() {
     glDeleteBuffers(1, &id);
 }
 
-VBO::VBO(VBO && other) noexcept
-    : id{other.getId()} {
-    other.setId(0);
-}
+// VBO::VBO(VBO && other) noexcept
+//     : id{other.getId()} {
+//     other.setId(0);
+// }
 
-VBO& VBO::operator=(VBO && other) noexcept {
-    if (this != &other) {         // Make sure that we don't do silly things when we try to move an object to itself
-        glDeleteBuffers(1, &id); // Delete the previous object
-        id = other.getId();      // Copy the object
-        other.setId(0);            // Make sure that other won't delete the _id we just copied
-    }
-    return *this;
-}
+// VBO& VBO::operator=(VBO && other) noexcept {
+//     if (this != &other) {         // Make sure that we don't do silly things when we try to move an object to itself
+//         glDeleteBuffers(1, &id); // Delete the previous object
+//         id = other.getId();      // Copy the object
+//         other.setId(0);            // Make sure that other won't delete the _id we just copied
+//     }
+//     return *this;
+// }
 
 GLuint VBO::getId() const {
     return this->id;

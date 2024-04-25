@@ -1,19 +1,16 @@
 #pragma once
 #include <vector>
+#include "Model3D.hpp"
 #include "glm/fwd.hpp"
-#include "p6/p6.h"
-
-#include "glimac/common.hpp"
 
 using vec = glm::vec3;
 
 class Boid {
 public:
     Boid();
-    explicit Boid(float wander);
 
-    void      display(glm::mat4 &ModelMatrix, glm::mat4 &ViewMatrix, glm::mat4 &MVMatrix, glm::mat4 &NormalMatrix, glm::mat4 ProjMatrix,
-                      GLint uMVPMatrix, GLint uMVMatrix, GLint uNormalMatrix) const;
+    void      display(glm::mat4 &ModelMatrix, glm::mat4 &ViewMatrix, glm::mat4 &ProjMatrix,
+                      GLint uMVPMatrix, GLint uMVMatrix, GLint uNormalMatrix, Model3D &model) const;
     void      updatePosition();
     vec       getPosition() const;
     glm::vec3 getColor() const;
@@ -27,5 +24,4 @@ private:
     vec       position;
     glm::vec3 color;
     vec       direction;
-    std::vector<glimac::ShapeVertex> vertices;
 };
