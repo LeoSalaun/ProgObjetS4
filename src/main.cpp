@@ -6,7 +6,12 @@
 #include "functions.hpp"
 #include "Texture.hpp"
 #include "Model3D.hpp"
-
+// #include "structures.cpp"
+#include <img/src/Image.h>
+#include <vector>
+#include "functions.hpp"
+#include "glimac/FreeflyCamera.hpp"
+#include "glimac/common.hpp"
 #include "glimac/sphere_vertices.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
@@ -33,7 +38,8 @@ int main()
     );
 
     ListeBoids listeBoids{};
-    for (int i=0 ; i<60 ; i++) {
+    for (int i = 0; i < 60; i++)
+    {
         listeBoids.addBoid(Boid{});
     }
 
@@ -89,14 +95,14 @@ int main()
     // INTERFACE MANAGEMENT
 
     auto separation = 5.f;
-    auto cohesion = .05f;
-    auto alignment = 50.f;
+    auto cohesion   = .05f;
+    auto alignment  = 50.f;
 
     ctx.imgui = [&]() {
         ImGui::Begin("Steering forces");
-        ImGui::SliderFloat("Separation strength", &separation, 0.f, 10.f );
-        ImGui::SliderFloat("Cohesion strength",   &cohesion,   0.f, .1f  );
-        ImGui::SliderFloat("Alignment strength",  &alignment,  0.f, 100.f);
+        ImGui::SliderFloat("Separation strength", &separation, 0.f, 10.f);
+        ImGui::SliderFloat("Cohesion strength", &cohesion, 0.f, .1f);
+        ImGui::SliderFloat("Alignment strength", &alignment, 0.f, 100.f);
         ImGui::End();
         ImGui::ShowDemoWindow();
     };
