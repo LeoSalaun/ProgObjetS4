@@ -7,7 +7,7 @@ using vec = glm::vec3;
 
 class Boid {
 public:
-    Boid();
+    Boid(int sizeBoid);
 
     void      display(glm::mat4 &ModelMatrix, glm::mat4 &ViewMatrix, glm::mat4 &ProjMatrix,
                       GLint uMVPMatrix, GLint uMVMatrix, GLint uNormalMatrix, Model3D &model) const;
@@ -24,4 +24,5 @@ private:
     vec       position;
     glm::vec3 color;
     vec       direction;
+    int       size;
 };

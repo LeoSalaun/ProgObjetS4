@@ -14,32 +14,16 @@
 #include "glm/gtc/type_ptr.hpp"
 
 
-Boid::Boid()
-    : position{vec((rand01() - 0.5f) * 0.8f, (rand01() - 0.5f) * 0.8f, (rand01() - 0.5f) * 0.8f)},
-    //    color{ glm::vec3(rand01(), rand01(), rand01())},
-    direction{vec((rand01() - 0.5f) * 0.001f, (rand01() - 0.5f) * 0.001f, (rand01() - 0.5f) * 0.001f)}
-    //, vertices{glimac::sphere_vertices(1.f, 64.f, 32.f)}
-    {
-        // Nuances aléatoires  avec BERNOULLI
-        float probability = 0.5f; // Probabilité d'accentuer la composante rouge
-        srand(time(nullptr));
+Boid::Boid(int sizeBoid)
+    // :position{ (geometricTrial(0.5)%10) * 0.1 - 0.5f,  (geometricTrial(0.5)%10) * 0.1 - 0.5f,  (geometricTrial(0.5)%10) * 0.1 - 0.5f},
+    :position{ std::fmod(geometricTrial(0.5),10)*0.1 - 0.5f,  std::fmod(geometricTrial(0.5),10)*0.1 - 0.5f, std::fmod(geometricTrial(0.5),10)*0.1 - 0.5f},
 
-        // Comparaison valeurs à la probabilité p de Bernoulli
+    // color{ generateExponential(0.5f), generateExponential(0.5f), generateExponential(0.5f)},
+    direction{vec((rand01() - 0.5f) * 0.001f, (rand01() - 0.5f) * 0.001f, (rand01() - 0.5f) * 0.001f)},
+    // , vertices{glimac::sphere_vertices(1.f, 64.f, 32.f)}
+    size{sizeBoid}
+    {}
 
-
-        float r = (rand() / (RAND_MAX + 1.0f)) < probability ? (rand() / (RAND_MAX + 1.0f)) : (rand() / (RAND_MAX + 1.0f)) * 0.5f; // Rouge
-        float g = (rand() / (RAND_MAX + 1.0f)) < probability ? (rand() / (RAND_MAX + 1.0f)) : (rand() / (RAND_MAX + 1.0f)) * 0.5f; // Vert
-        float b = (rand() / (RAND_MAX + 1.0f)) < probability ? (rand() / (RAND_MAX + 1.0f)) : (rand() / (RAND_MAX + 1.0f)) * 0.5f; // Bleu
-    
-        // Normaliser les valeurs de couleur pour qu'elles soient dans l'intervalle [0, 1]
-        r = std::clamp(r, 0.0f, 1.0f);
-        g = std::clamp(g, 0.0f, 1.0f);
-        b = std::clamp(b, 0.0f, 1.0f);
-    
-        // std::cout<<color[0];
-        // std::cout<<color[1];
-        // std::cout<<color[2];
-}
 void Boid::display(glm::mat4 &ModelMatrix, glm::mat4 &ViewMatrix, glm::mat4 &ProjMatrix,
                    const GLint uMVPMatrix, const GLint uMVMatrix, const GLint uNormalMatrix, Model3D &model) const
 {
@@ -52,7 +36,9 @@ void Boid::display(glm::mat4 &ModelMatrix, glm::mat4 &ViewMatrix, glm::mat4 &Pro
     ModelMatrix = glm::mat4(1.f);
     ModelMatrix = glm::translate(ModelMatrix, {20.f*position.x, 20.f*position.y, 20.f*position.z}); // CALCULATE TRANSLATION MATRIX
     //ModelMatrix = glm::rotate(ModelMatrix, angle, axis);
-    model.drawObject(ViewMatrix, ModelMatrix, ProjMatrix, uMVPMatrix, uMVMatrix, uNormalMatrix); // DRAW
+    ModelMatrix = glm::scale(ModelMatrix, glm::vec3(size/10.f));
+    // std::cout<< size <<std::endl;
+    model.drawObject(ViewMatrix, ModelMatrix, ProjMatrix, uMVPMatrix, uMVMatrix, uNormalMatrix); // DRAW``
 }
 
 void Boid::updatePosition()

@@ -3,12 +3,12 @@
 #include <ostream>
 #include "glm/trigonometric.hpp"
 #define DOCTEST_CONFIG_IMPLEMENT
-#include "doctest/doctest.h"
 #include "Boid.hpp"
 #include "ListeBoids.hpp"
-#include "functions.hpp"
-#include "Texture.hpp"
 #include "Model3D.hpp"
+#include "Texture.hpp"
+#include "doctest/doctest.h"
+#include "functions.hpp"
 // #include "structures.cpp"
 #include <img/src/Image.h>
 #include <vector>
@@ -39,35 +39,39 @@ int main()
         "src/shaders/allLights.fs.glsl"
     );
 
+    double     number   = uniform(10, 50);
+    int        intValue = static_cast<int>(number);
+    double     meanSize = 10.0;
     ListeBoids listeBoids{};
-    for (int i = 0; i < 60; i++)
+    for (int i = 0; i < intValue; i++)
     {
-        listeBoids.addBoid(Boid{});
+        int size = poissonRandom(meanSize);
+        listeBoids.addBoid(Boid{size});
     }
 
     // GET UNIFORM VARIABLES
 
-    GLint uMVPMatrix = glGetUniformLocation(shader.id(),"uMVPMatrix");
-    GLint uMVMatrix = glGetUniformLocation(shader.id(),"uMVMatrix");
-    GLint uNormalMatrix = glGetUniformLocation(shader.id(),"uNormalMatrix");
-    GLint uTexture = glGetUniformLocation(shader.id(),"uTexture");
+    GLint uMVPMatrix    = glGetUniformLocation(shader.id(), "uMVPMatrix");
+    GLint uMVMatrix     = glGetUniformLocation(shader.id(), "uMVMatrix");
+    GLint uNormalMatrix = glGetUniformLocation(shader.id(), "uNormalMatrix");
+    GLint uTexture      = glGetUniformLocation(shader.id(), "uTexture");
 
     // Calculate random materials for the lighting
 
-    glm::vec3 kd{rand01(),rand01(),rand01()};
-    glm::vec3 ks{rand01(),rand01(),rand01()};
+    // glm::vec3 kd{rand01(),rand01(),rand01()};
+    // glm::vec3 ks{rand01(),rand01(),rand01()};
 
-    GLint uKdCenter = glGetUniformLocation(shader.id(),"uKdCenter");
-    GLint uKsCenter = glGetUniformLocation(shader.id(),"uKsCenter");
-    GLint uShininessCenter = glGetUniformLocation(shader.id(),"uShininessCenter");
-    GLint uLightPosCenter = glGetUniformLocation(shader.id(),"uLightPosCenter");
-    GLint uLightIntensityCenter = glGetUniformLocation(shader.id(),"uLightIntensityCenter");
+    GLint uKdCenter             = glGetUniformLocation(shader.id(), "uKdCenter");
+    GLint uKsCenter             = glGetUniformLocation(shader.id(), "uKsCenter");
+    GLint uShininessCenter      = glGetUniformLocation(shader.id(), "uShininessCenter");
+    GLint uLightPosCenter       = glGetUniformLocation(shader.id(), "uLightPosCenter");
+    GLint uLightIntensityCenter = glGetUniformLocation(shader.id(), "uLightIntensityCenter");
 
-    GLint uKdSelf = glGetUniformLocation(shader.id(),"uKdSelf");
-    GLint uKsSelf = glGetUniformLocation(shader.id(),"uKsSelf");
-    GLint uShininessSelf = glGetUniformLocation(shader.id(),"uShininessSelf");
-    GLint uLightPosSelf = glGetUniformLocation(shader.id(),"uLightPosSelf");
-    GLint uLightIntensitySelf = glGetUniformLocation(shader.id(),"uLightIntensitySelf");
+    GLint uKdSelf             = glGetUniformLocation(shader.id(), "uKdSelf");
+    GLint uKsSelf             = glGetUniformLocation(shader.id(), "uKsSelf");
+    GLint uShininessSelf      = glGetUniformLocation(shader.id(), "uShininessSelf");
+    GLint uLightPosSelf       = glGetUniformLocation(shader.id(), "uLightPosSelf");
+    GLint uLightIntensitySelf = glGetUniformLocation(shader.id(), "uLightIntensitySelf");
 
     // LOAD 3D MODELS
 
@@ -89,11 +93,7 @@ int main()
     Texture Metal("assets/textures/metal.jpg");
     Texture Rainbow("assets/textures/rainbow.jpg");
 
-
-
     glEnable(GL_DEPTH_TEST);
-
-
 
     FreeflyCamera camera;
     camera.moveFront(15.f);
@@ -148,6 +148,15 @@ int main()
         ImGui::End();
     };
 
+    // Variables aléatoires lumière diffuse
+    std::vector<int> dif = generateBernoulliSchema(0.5, 3);
+    // Variables aléatoires lumière gloossy
+    std::vector<int> glo = generateBernoulliSchema(0.5, 3);
+    // Variables aléatoires intensité lumière
+    std::vector<int> kd = generateHyperGeometric(20, 3, 15);
+    std::vector<int> ks = generateHyperGeometric(20, 3, 15);
+
+    double tailleUfo = std::abs(laplaceRandom(0, 0.5));
     // Declare your infinite update loop.
     ctx.update = [&]() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -160,24 +169,26 @@ int main()
 
         // CAMERA MANAGEMENT
 
-        if (ctx.key_is_pressed(GLFW_KEY_W)) camera.moveFront(-0.1f);
-        if (ctx.key_is_pressed(GLFW_KEY_A)) camera.moveLeft (-0.1f);
-        if (ctx.key_is_pressed(GLFW_KEY_S)) camera.moveFront( 0.1f);
-        if (ctx.key_is_pressed(GLFW_KEY_D)) camera.moveLeft ( 0.1f);
+        if (ctx.key_is_pressed(GLFW_KEY_W))
+            camera.moveFront(-0.1f);
+        if (ctx.key_is_pressed(GLFW_KEY_A))
+            camera.moveLeft(-0.1f);
+        if (ctx.key_is_pressed(GLFW_KEY_S))
+            camera.moveFront(0.1f);
+        if (ctx.key_is_pressed(GLFW_KEY_D))
+            camera.moveLeft(0.1f);
 
-        if(ctx.mouse_button_is_pressed(p6::Button::Right)) {
-            camera.rotateLeft(-ctx.mouse_delta().x*100.f);
-            camera.rotateUp(ctx.mouse_delta().y*100.f);
+        if (ctx.mouse_button_is_pressed(p6::Button::Right))
+        {
+            camera.rotateLeft(-ctx.mouse_delta().x * 100.f);
+            camera.rotateUp(ctx.mouse_delta().y * 100.f);
         }
 
-
-
         // CREATE MATRIX
-        
+      
         glm::mat4 ProjMatrix = glm::perspective(glm::radians(70.f), ctx.aspect_ratio(), 0.1f, 100.f);
         glm::mat4 ViewMatrix = camera.getViewMatrix();
         glm::mat4 ModelMatrix;
-
 
 
 
@@ -205,13 +216,15 @@ int main()
         ModelMatrix = glm::rotate(ModelMatrix, glm::radians(90.f), {0.f, 1.f, 0.f});
 
         solrock.drawObject(ViewMatrix, ModelMatrix, ProjMatrix, uMVPMatrix, uMVMatrix, uNormalMatrix);
-
-        glUniform3f(uKdCenter, kd.x,kd.y,kd.z);                         // APPLY LIGHTING TO SUN
-        glUniform3f(uKsCenter, ks.x,ks.y,ks.z);
+      
+        // APPLY LIGHTING TO SUN
+      
+        glUniform3f(uKdCenter, (float)dif[0], (float)dif[1], (float)dif[2]);           
+        glUniform3f(uKsCenter, (float)glo[0], (float)glo[1], (float)glo[2]);
         glUniform1f(uShininessCenter, 1.f);
         glm::vec4 lightPos = ViewMatrix*glm::translate(ModelMatrix, vec(0.f,55.f,0.f))*glm::vec4(1.f, 1.f, 1.f, 1.f);
         glUniform3f(uLightPosCenter, lightPos.x, lightPos.y, lightPos.z);
-        glUniform3f(uLightIntensityCenter, 500.f, 500.f, 500.f);
+        glUniform3f(uLightIntensityCenter, (float)kd[0] * 500.f, (float)kd[1] * 500.f, (float)kd[2] * 500.f);
 
         SunMap.unbind();
 
@@ -235,12 +248,12 @@ int main()
 
         lunatone.drawObject(ViewMatrix, ModelMatrix, ProjMatrix, uMVPMatrix, uMVMatrix, uNormalMatrix);
 
-        glUniform3f(uKdSelf, kd.x,kd.y,kd.z);
-        glUniform3f(uKsSelf, ks.x,ks.y,ks.z);
+        glUniform3f(uKdSelf, (float)dif[0], (float)dif[1], (float)dif[2]);
+        glUniform3f(uKsSelf, (float)glo[0], (float)glo[1], (float)glo[2]);
         glUniform1f(uShininessSelf, 1.f);
-        lightPos = glm::vec4(1.f, 1.f, 1.f,1.f);
+        lightPos = glm::vec4(1.f, 1.f, 1.f, 1.f);
         glUniform3f(uLightPosSelf, lightPos.x, lightPos.y, lightPos.z);
-        glUniform3f(uLightIntensitySelf, 25.f, 25.f, 25.f);
+        glUniform3f(uLightIntensitySelf, (float)ks[0] * 25.f, (float)ks[1] * 25.f, (float)ks[2] * 25.f);
 
         MoonMap.unbind();
 
@@ -260,8 +273,9 @@ int main()
         Metal.bind();
 
         ModelMatrix = glm::inverse(ViewMatrix);
-        ModelMatrix = glm::translate(ModelMatrix, vec(0.f,-2.f,-5.f));
+        ModelMatrix = glm::translate(ModelMatrix, vec(0.f, -2.f, -5.f));
         ModelMatrix = glm::rotate(ModelMatrix, glm::radians(180.f), {1.f, 0.f, 0.f});
+        ModelMatrix = glm::scale(ModelMatrix, glm::vec3(tailleUfo + 0.5f));
         ModelMatrix = glm::rotate(ModelMatrix, glm::radians(90.f), {0.f, 1.f, 0.f});
 
         ufo.drawObject(ViewMatrix, ModelMatrix, ProjMatrix, uMVPMatrix, uMVMatrix, uNormalMatrix);

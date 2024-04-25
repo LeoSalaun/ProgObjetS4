@@ -45,3 +45,4 @@ double geometricTrial(double p);
 int poissonRandom(double lambda);
 
 double laplaceRandom(double mu, double b);
+
