@@ -29,8 +29,7 @@ void main() {
 
     // Combining lighting with texture color
     vec4 textureColor = texture(uTexture, vTextCoords);
-    // fFragColor = vec4(textureColor.xyz * 0.3 + light, textureColor.a);
-    fFragColor = textureColor;
+    fFragColor = vec4(textureColor.xyz * 0.3 + light, textureColor.a);
 }
 
 vec3 blinnPhongPos(vec3 uKd, vec3 uKs, float uShininess, vec3 uLightPos, vec3 uLightIntensity) {

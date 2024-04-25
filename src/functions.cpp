@@ -106,7 +106,7 @@ std::vector<int> generateBernoulliSchema(double probaSuccess, int essaie)
 
     for (int i = 0; i < essaie; i++)
     {
-        double randNum = static_cast<double>(rand01()) / RAND_MAX; // Générer un nombre entre 0 et 1
+        double randNum = rand01(); // Générer un nombre entre 0 et 1
         if (randNum <= probaSuccess)
         {
             result.push_back(1);
