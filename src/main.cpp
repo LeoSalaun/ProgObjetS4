@@ -21,7 +21,6 @@
 #include "glm/fwd.hpp"
 #include "glm/matrix.hpp"
 #include <img/src/Image.h>
-#include "glimac/FreeflyCamera.hpp"
 
 using namespace glimac;
 
@@ -122,7 +121,15 @@ int main()
 
 
 
-    float frame = 0;
+    int frame = 0;
+
+    int updatePlanetFrame1 = static_cast<int>(generateExponential(1.f/180.f));
+    float speed1 = static_cast<float>(uniform(0.1, 1.));
+    float positionPlanet1 = 0.f;
+
+    int updatePlanetFrame2 = static_cast<int>(generateExponential(1.f/300.f));
+    float speed2 = static_cast<float>(uniform(0.1, 1.));
+    float positionPlanet2 = 0.f;
 
 
 
@@ -265,16 +272,31 @@ int main()
 
         PlanetMap.bind();
 
+        if (frame == updatePlanetFrame1) {
+            updatePlanetFrame1 += static_cast<float>(generateExponential(1.f/180.f));
+            speed1 = static_cast<float>(uniform(0.1, 1.));
+        }
+
+        positionPlanet1 += speed1;
+
         ModelMatrix = glm::mat4(1.f);
-        ModelMatrix = glm::rotate(ModelMatrix, glm::radians(60.f), {0.f, 0.f, 11.f});
-        ModelMatrix = glm::rotate(ModelMatrix, glm::radians(frame/2.f), {0.f, 1.f, 0.f});
+        ModelMatrix = glm::rotate(ModelMatrix, glm::radians(180.f), {0.f, 0.f, 11.f});
+        ModelMatrix = glm::rotate(ModelMatrix, glm::radians(positionPlanet1), {0.f, 1.f, 0.f});
         ModelMatrix = glm::translate(ModelMatrix, vec(30.f,0.f,0.f));
         ModelMatrix = glm::scale(ModelMatrix, glm::vec3(5.f));
 
         planet.drawObject(ViewMatrix, ModelMatrix, ProjMatrix, uMVPMatrix, uMVMatrix, uNormalMatrix);
 
+        if (frame == updatePlanetFrame2) {
+            updatePlanetFrame2 += static_cast<float>(generateExponential(1.f/300.f));
+            speed2 = static_cast<float>(uniform(0.1, 1.));
+        }
+
+        positionPlanet2 += speed2;
+
         ModelMatrix = glm::mat4(1.f);
-        ModelMatrix = glm::rotate(ModelMatrix, glm::radians(frame/2.f), {0.f, 1.f, 0.f});
+        ModelMatrix = glm::rotate(ModelMatrix, glm::radians(300.f), {0.f, 0.f, 11.f});
+        ModelMatrix = glm::rotate(ModelMatrix, glm::radians(positionPlanet2), {0.f, 1.f, 0.f});
         ModelMatrix = glm::translate(ModelMatrix, vec(20.f,0.f,0.f));
         ModelMatrix = glm::scale(ModelMatrix, glm::vec3(5.f));
 

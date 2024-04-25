@@ -18,7 +18,7 @@ Boid::Boid()
     : position{vec((rand01() - 0.5f) * 0.8f, (rand01() - 0.5f) * 0.8f, (rand01() - 0.5f) * 0.8f)},
     //    color{ glm::vec3(rand01(), rand01(), rand01())},
     direction{vec((rand01() - 0.5f) * 0.001f, (rand01() - 0.5f) * 0.001f, (rand01() - 0.5f) * 0.001f)}
-    , vertices{glimac::sphere_vertices(1.f, 64.f, 32.f)}
+    //, vertices{glimac::sphere_vertices(1.f, 64.f, 32.f)}
     {
         // Nuances aléatoires  avec BERNOULLI
         float probability = 0.5f; // Probabilité d'accentuer la composante rouge
