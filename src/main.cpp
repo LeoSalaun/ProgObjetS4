@@ -153,8 +153,8 @@ int main()
     // Variables aléatoires lumière gloossy
     std::vector<int> glo = generateBernoulliSchema(0.5, 3);
     // Variables aléatoires intensité lumière
-    std::vector<int> kd = generateHyperGeometric(20, 3, 15);
-    std::vector<int> ks = generateHyperGeometric(20, 3, 15);
+    std::vector<int> ufoIntensity = generateHyperGeometric(20, 3, 15);
+    std::vector<int> sunIntensity = generateHyperGeometric(20, 3, 15);
 
     double tailleUfo = std::abs(laplaceRandom(0, 0.5));
     // Declare your infinite update loop.
@@ -224,7 +224,7 @@ int main()
         glUniform1f(uShininessCenter, 1.f);
         glm::vec4 lightPos = ViewMatrix*glm::translate(ModelMatrix, vec(0.f,55.f,0.f))*glm::vec4(1.f, 1.f, 1.f, 1.f);
         glUniform3f(uLightPosCenter, lightPos.x, lightPos.y, lightPos.z);
-        glUniform3f(uLightIntensityCenter, (float)kd[0] * 500.f, (float)kd[1] * 500.f, (float)kd[2] * 500.f);
+        glUniform3f(uLightIntensityCenter, (float)sunIntensity[0] * 500.f, (float)sunIntensity[1] * 500.f, (float)sunIntensity[2] * 500.f);
 
         SunMap.unbind();
 
@@ -253,7 +253,7 @@ int main()
         glUniform1f(uShininessSelf, 1.f);
         lightPos = glm::vec4(1.f, 1.f, 1.f, 1.f);
         glUniform3f(uLightPosSelf, lightPos.x, lightPos.y, lightPos.z);
-        glUniform3f(uLightIntensitySelf, (float)ks[0] * 25.f, (float)ks[1] * 25.f, (float)ks[2] * 25.f);
+        glUniform3f(uLightIntensitySelf, (float)ufoIntensity[0] * 25.f, (float)ufoIntensity[1] * 25.f, (float)ufoIntensity[2] * 25.f);
 
         MoonMap.unbind();
 
