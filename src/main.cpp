@@ -18,7 +18,7 @@
 #include "glm/fwd.hpp"
 #include "glm/matrix.hpp"
 #include <img/src/Image.h>
-#include "glimac/FreeflyCamera.hpp"
+
 
 using namespace glimac;
 
@@ -37,10 +37,15 @@ int main()
         "src/shaders/allLights.fs.glsl"
     );
 
+double number = uniform(10,50);
+int intValue = static_cast<int>(number);
+double meanSize = 10.0; 
     ListeBoids listeBoids{};
-    for (int i = 0; i < 60; i++)
+    for (int i = 0; i < intValue; i++)
     {
-        listeBoids.addBoid(Boid{});
+        int size = poissonRandom(meanSize);
+        std::cout<<size<<std::endl;
+        listeBoids.addBoid(Boid{size});
     }
 
     // GET UNIFORM VARIABLES
@@ -52,8 +57,8 @@ int main()
 
     // Calculate random materials for the lighting
 
-    glm::vec3 kd{rand01(),rand01(),rand01()};
-    glm::vec3 ks{rand01(),rand01(),rand01()};
+    // glm::vec3 kd{rand01(),rand01(),rand01()};
+    // glm::vec3 ks{rand01(),rand01(),rand01()};
 
     GLint uKdCenter = glGetUniformLocation(shader.id(),"uKdCenter");
     GLint uKsCenter = glGetUniformLocation(shader.id(),"uKsCenter");
@@ -107,6 +112,13 @@ int main()
         ImGui::ShowDemoWindow();
     };
 
+    //Variables aléatoires lumière diffuse
+    std::vector<int> dif = generateBernoulliSchema(0.5, 3);
+    //Variables aléatoires lumière gloossy
+    std::vector<int> glo = generateBernoulliSchema(0.5, 3);
+    //Variables aléatoires intensité lumière
+    std::vector<int> kd = generateHyperGeometric(20, 3, 15);
+    std::vector<int> ks= generateHyperGeometric(20, 3, 15);
     // Declare your infinite update loop.
     ctx.update = [&]() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -135,19 +147,19 @@ int main()
         glm::mat4 ViewMatrix = camera.getViewMatrix();
         glm::mat4 ModelMatrix;
 
-        glUniform3f(uKdCenter, kd.x,kd.y,kd.z);
-        glUniform3f(uKsCenter, ks.x,ks.y,ks.z);
+        glUniform3f(uKdCenter, (float)dif[0], (float)dif[1], (float)dif[2]);
+        glUniform3f(uKsCenter, (float)glo[0], (float)glo[1], (float)glo[2]);
         glUniform1f(uShininessCenter, 1.f);
         glm::vec4 lightPos = ViewMatrix*glm::vec4(1.f, 1.f, 1.f, 1.f);
         glUniform3f(uLightPosCenter, lightPos.x, lightPos.y, lightPos.z);
-        glUniform3f(uLightIntensityCenter, 15.f, 15.f, 15.f);
+        glUniform3f(uLightIntensityCenter, (float)kd[0]*15.f, (float)kd[1]*15.f, (float)kd[2]*15.f);
 
-        glUniform3f(uKdSelf, kd.x,kd.y,kd.z);
-        glUniform3f(uKsSelf, ks.x,ks.y,ks.z);
+        glUniform3f(uKdSelf, (float)dif[0], (float)dif[1], (float)dif[2]);
+        glUniform3f(uKsSelf,(float)glo[0], (float)glo[1], (float)glo[2]);
         glUniform1f(uShininessSelf, 1.f);
         lightPos = glm::vec4(1.f, 1.f, 1.f,1.f);
         glUniform3f(uLightPosSelf, lightPos.x, lightPos.y, lightPos.z);
-        glUniform3f(uLightIntensitySelf, 25.f, 25.f, 25.f);
+        glUniform3f(uLightIntensitySelf, (float)ks[0]*25.f,(float)ks[1]*25.f,(float)ks[2]*25.f);
 
 
 

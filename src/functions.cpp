@@ -106,7 +106,7 @@ std::vector<int> generateBernoulliSchema(double probaSuccess, int essaie) {
 
 //Loi exponentielle
 double generateExponential(double lambda) {
-    double u = static_cast<double>(rand01()) / RAND_MAX; // Générer un nombre aléatoire U entre 0 et 1
+    double u = rand01(); // Générer un nombre aléatoire U entre 0 et 1
     return -log(1 - u) / lambda; // Utiliser la fonction inverse de la CDF exponentielle
 }
 
@@ -115,7 +115,7 @@ double geometricTrial(double p) {
     int count = 0;
     while (true) {
         count++;
-        if (rand() % 100 < p * 100) {
+        if (rand01() * 100 <= p * 100) {
             return count;
         }
     }
@@ -123,13 +123,14 @@ double geometricTrial(double p) {
 
 //Loi de poisson
 int poissonRandom(double lambda) {
+    std::cout << lambda << std::endl;
     double L = exp(-lambda);
     double p = 1.0;
     int k = 0;
 
     do {
         k++;
-        p *= static_cast<double>(rand01()) / RAND_MAX;
+        p *= rand01();
     } while (p > L);
 
     return k - 1;

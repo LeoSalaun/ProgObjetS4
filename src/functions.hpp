@@ -30,3 +30,17 @@ struct Object3D{
 Object3D loadOBJ(const char * path);
 
 void enableVertex(VBO &vbo, VAO &vao,  std::vector<glimac::ShapeVertex> vertices);
+
+double uniform(double a, double b);
+
+std::vector<int> generateHyperGeometric(int nombreTotal, int essaie, int nombreSucces);
+
+std::vector<int> generateBernoulliSchema(double probaSuccess, int essaie);
+
+double generateExponential(double lambda);
+
+double geometricTrial(double p);
+
+int poissonRandom(double lambda);
+
+double laplaceRandom(double mu, double b);
