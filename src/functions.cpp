@@ -2,6 +2,8 @@
 #include <random>
 #include <iostream>
 #include "glimac/common.hpp"
+#include "glm/common.hpp"
+#include "glm/ext/quaternion_geometric.hpp"
 
 float rand01()
 {
@@ -49,4 +51,35 @@ void enableVertex(VBO &vbo, VAO &vao,  std::vector<glimac::ShapeVertex> vertices
     
     vbo.unbind(GL_ARRAY_BUFFER);
     vao.unbind();
+}
+
+void calculateMarkovState(glm::vec4 &currentState, glm::mat4 matrix) {
+    glm::vec4 newProba = matrix*currentState;
+
+    float randomValue = rand01();
+    float randomSum = 0.f;
+    int state = 0;
+
+    for (state = 0; state < 4; ++state) {
+        randomSum += newProba[state];
+        if (randomValue <= randomSum) {
+            break;
+        }
+    }
+
+    
+    // std::cout << state << " " << randomSum << std::endl;
+    // std::cout << newProba[0] << " " << newProba[1]  << " " << newProba[2]  << " " << newProba[3] << std::endl;
+
+    switch (state) {
+        case 0  : currentState = {1.f, 0.f, 0.f, 0.f};
+                  break;
+        case 1  : currentState = {0.f, 1.f, 0.f, 0.f};
+                  break;
+        case 2  : currentState = {0.f, 0.f, 1.f, 0.f};
+                  break;
+        case 3  : currentState = {0.f, 0.f, 0.f, 1.f};
+                  break;
+        default : break;
+    }
 }
