@@ -1,10 +1,10 @@
 #include "functions.hpp"
-#include <random>
-#include <iostream>
-#include "glimac/common.hpp"
-#include <vector>
 #include <cstdlib> // pour rand()
-#include <ctime> 
+#include <ctime>
+#include <iostream>
+#include <random>
+#include <vector>
+#include "glimac/common.hpp"
 
 float rand01()
 {
@@ -14,27 +14,31 @@ float rand01()
     return distrib(gen);
 }
 
-Object3D loadOBJ(const char * path) { // LOAD OBJECT FROM PATH
+Object3D loadOBJ(const char* path)
+{ // LOAD OBJECT FROM PATH
     Object3D toreturn;
 
-    std::vector<tinyobj::shape_t> shapes;
+    std::vector<tinyobj::shape_t>    shapes;
     std::vector<tinyobj::material_t> materials;
-    std::vector<float> positions;
+    std::vector<float>               positions;
 
     std::cout << tinyobj::LoadObj(shapes, materials, path);
 
-    for(auto s : shapes[0].mesh.positions) positions.push_back(s);
-    for(auto i : shapes[0].mesh.indices) {
+    for (auto s : shapes[0].mesh.positions)
+        positions.push_back(s);
+    for (auto i : shapes[0].mesh.indices)
+    {
         glimac::ShapeVertex tmp;
-        tmp.position = glm::vec3(positions[i*3], positions[i*3 + 1], positions[i*3+2]);
-        tmp.normal = glm::vec3(shapes[0].mesh.normals[i*3], shapes[0].mesh.normals[i*3+1], shapes[0].mesh.normals[i*3+2]);
-        tmp.texCoords = glm::vec2(shapes[0].mesh.texcoords[i*2], shapes[0].mesh.texcoords[i*2+1]);
+        tmp.position  = glm::vec3(positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2]);
+        tmp.normal    = glm::vec3(shapes[0].mesh.normals[i * 3], shapes[0].mesh.normals[i * 3 + 1], shapes[0].mesh.normals[i * 3 + 2]);
+        tmp.texCoords = glm::vec2(shapes[0].mesh.texcoords[i * 2], shapes[0].mesh.texcoords[i * 2 + 1]);
         toreturn.vertices.push_back(tmp);
-    } 
+    }
     return toreturn;
 }
 
-void enableVertex(VBO &vbo, VAO &vao,  std::vector<glimac::ShapeVertex> vertices) { // ENABLE VBO AND VAO
+void enableVertex(VBO& vbo, VAO& vao, std::vector<glimac::ShapeVertex> vertices)
+{ // ENABLE VBO AND VAO
     vbo.bind(GL_ARRAY_BUFFER);
     glBufferData(GL_ARRAY_BUFFER, static_cast<glm::int64>(vertices.size() * sizeof(glimac::ShapeVertex)), vertices.data(), GL_STATIC_DRAW);
     vbo.unbind(GL_ARRAY_BUFFER);
@@ -49,32 +53,36 @@ void enableVertex(VBO &vbo, VAO &vao,  std::vector<glimac::ShapeVertex> vertices
     glVertexAttribPointer(VERTEX_ATTR_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, position));
     glVertexAttribPointer(VERTEX_ATTR_NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, normal));
     glVertexAttribPointer(VERTEX_ATTR_TEXCOORDS, 2, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, texCoords));
-    
+
     vbo.unbind(GL_ARRAY_BUFFER);
     vao.unbind();
 }
 
-//Loi uniforme
+// Loi uniforme
 double uniform(double a, double b)
 {
     return a + (b - a) * rand01();
 }
 
-//Loi hypergeometrique
-std::vector<int> generateHyperGeometric(int nombreTotal, int essaie, int nombreSucces) {
+// Loi hypergeometrique
+std::vector<int> generateHyperGeometric(int nombreTotal, int essaie, int nombreSucces)
+{
     std::vector<int> result;
     std::vector<int> TotalArray;
 
     // Initialiser TotalArray avec les succès et les échecs
-    for (int i = 0; i < nombreSucces; i++) {
+    for (int i = 0; i < nombreSucces; i++)
+    {
         TotalArray.push_back(1);
     }
-    for (int i = 0; i < (nombreTotal - nombreSucces); i++) {
+    for (int i = 0; i < (nombreTotal - nombreSucces); i++)
+    {
         TotalArray.push_back(0);
     }
 
     // Générer les résultats
-    for (int i = 0; i < essaie; i++) {
+    for (int i = 0; i < essaie; i++)
+    {
         int randIndex = rand() % nombreTotal;
         result.push_back(TotalArray[randIndex]);
         TotalArray.erase(TotalArray.begin() + randIndex);
@@ -83,20 +91,25 @@ std::vector<int> generateHyperGeometric(int nombreTotal, int essaie, int nombreS
     return result;
 }
 
-//Bernoulli
-std::vector<int> generateBernoulliSchema(double probaSuccess, int essaie) {
+// Bernoulli
+std::vector<int> generateBernoulliSchema(double probaSuccess, int essaie)
+{
     std::vector<int> result;
 
-    if (probaSuccess > 1 || probaSuccess < 0) {
-        std::cout << "La probabilité doit être comprise entre 0 et 1" << std::endl;
+    if (probaSuccess > 1 || probaSuccess < 0)
+    {
         return result;
     }
 
-    for (int i = 0; i < essaie; i++) {
+    for (int i = 0; i < essaie; i++)
+    {
         double randNum = static_cast<double>(rand01()) / RAND_MAX; // Générer un nombre entre 0 et 1
-        if (randNum <= probaSuccess) {
+        if (randNum <= probaSuccess)
+        {
             result.push_back(1);
-        } else {
+        }
+        else
+        {
             result.push_back(0);
         }
     }
@@ -104,31 +117,36 @@ std::vector<int> generateBernoulliSchema(double probaSuccess, int essaie) {
     return result;
 }
 
-//Loi exponentielle
-double generateExponential(double lambda) {
-    double u = rand01(); // Générer un nombre aléatoire U entre 0 et 1
+// Loi exponentielle
+double generateExponential(double lambda)
+{
+    double u = rand01();         // Générer un nombre aléatoire U entre 0 et 1
     return -log(1 - u) / lambda; // Utiliser la fonction inverse de la CDF exponentielle
 }
 
-//Loi géométrique
-double geometricTrial(double p) {
+// Loi géométrique
+double geometricTrial(double p)
+{
     int count = 0;
-    while (true) {
+    while (true)
+    {
         count++;
-        if (rand01() * 100 <= p * 100) {
+        if (rand01() * 100 <= p * 100)
+        {
             return count;
         }
     }
 }
 
-//Loi de poisson
-int poissonRandom(double lambda) {
-    std::cout << lambda << std::endl;
+// Loi de poisson
+int poissonRandom(double lambda)
+{
     double L = exp(-lambda);
     double p = 1.0;
-    int k = 0;
+    int    k = 0;
 
-    do {
+    do
+    {
         k++;
         p *= rand01();
     } while (p > L);
@@ -136,9 +154,10 @@ int poissonRandom(double lambda) {
     return k - 1;
 }
 
-//Loi de Laplace
-double laplaceRandom(double mu, double b) {
-    double p = static_cast<double>(rand01()) / RAND_MAX; // Génère un nombre aléatoire uniforme entre 0 et 1
-    int sgn = (p < 0.5) ? -1 : 1; // Fonction signe basée sur p
+// Loi de Laplace
+double laplaceRandom(double mu, double b)
+{
+    double p = rand01(); // Génère un nombre aléatoire uniforme entre 0 et 1
+    int    sgn = (p < 0.5) ? -1 : 1;                       // Fonction signe basée sur p
     return mu - b * sgn * log(1 - 2 * fabs(p - 0.5));
 }
