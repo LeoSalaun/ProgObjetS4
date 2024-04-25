@@ -6,7 +6,6 @@
 #include "glimac/common.hpp"
 
 
-
 #include "vbo.hpp"
 #include "vao.hpp"
 
@@ -31,6 +30,8 @@ Object3D loadOBJ(const char * path);
 
 void enableVertex(VBO &vbo, VAO &vao,  std::vector<glimac::ShapeVertex> vertices);
 
+void calculateMarkovState(glm::vec4 &currentState, glm::mat4 matrix);
+
 double uniform(double a, double b);
 
 std::vector<int> generateHyperGeometric(int nombreTotal, int essaie, int nombreSucces);
@@ -44,3 +45,4 @@ double geometricTrial(double p);
 int poissonRandom(double lambda);
 
 double laplaceRandom(double mu, double b);
+
